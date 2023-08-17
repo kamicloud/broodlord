@@ -1,6 +1,6 @@
 {
   "name": "broodlord",
-  "private": true,
+  "version": "0.0.2",
   "description": "",
   "scripts": {
     "dev": "tsc --noEmit && cross-env NODE_CONFIG_DIR=./example/config ts-node ./src/main.ts"

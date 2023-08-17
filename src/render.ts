@@ -1,42 +1,26 @@
 import { Liquid } from "liquidjs";
 import path from 'path'
 import _ from "lodash";
-import fs from 'fs'
+import fs from './helpers/fs'
+import { getContextsBySource, useLiquid, LiquidFilters } from './helpers/stub'
 
 export default async (name: string, stubAll: Stub.All) => {
   const c = require('config')
 
-  const realRootPath = c.get('config.root_path')
-  const liquidTemplatePath = c.get('config.liquid_template_path')
+  const realRootPath = path.resolve(c.config?.output_root_path || '')
+  const liquidTemplatePath = path.resolve(c.config?.liquid_template_path || `${c.template_path}/../stubs`)
 
-  if (!liquidTemplatePath) {
-    throw new Error('Please set config.liquid_template_path!')
-  }
-
-  const engine = getEngine(liquidTemplatePath)
   const config = c.get(name) as Config
 
-  const rootPath = path.resolve(realRootPath ? path.resolve(realRootPath) : '', config.path)
+  const rootPath = path.resolve(realRootPath, config.path)
   const pipelines = config.pipelines
   const filters = config.filters
 
   const renders: { [key: string]: BaseRender } = {}
-
-  // bind filters
-  for (const filterName in filters) {
-    engine.registerFilter(filterName, (value: string) => {
-      for (const key in filters[filterName]) {
-        if (value === key) {
-          return filters[filterName][key]
-        }
-      }
-
-      return value
-    })
-  }
+  const liquid = useLiquid(liquidTemplatePath, filters)
 
   const registerRender = (render: any) => {
-    const r = new render(rootPath, engine)
+    const r = new render(rootPath, liquid)
 
     renders[r.name] = r
   }
@@ -62,39 +46,22 @@ export default async (name: string, stubAll: Stub.All) => {
 
 export abstract class BaseRender {
   public name = ''
-  public engine: Liquid
-  public rootPath: string
-  public allowedSource: AllowedSource | null = null
-  public fs = {
-    rm(target: string) {
-      fs.rmSync(target, {
-        force: true,
-        recursive: true
-      })
-    },
-    writeFile(target: string, data: string) {
-      fs.mkdirSync(path.dirname(target), {
-        recursive: true
-      })
+  readonly liquid: Liquid
+  readonly rootPath: string
+  readonly allowedSource: AllowedSource | null = null
+  readonly fs = fs
 
-      fs.writeFileSync(target, data, {
-        flag: 'w+'
-      })
-    }
-  }
-
-  constructor(rootPath: string, engine: Liquid) {
+  constructor(rootPath: string, liquid: Liquid) {
     this.rootPath = rootPath
-    this.engine = engine
+    this.liquid = liquid
   }
 
-  process(stubAll: Stub.All, pipeline: Pipeline) {
+  readonly process = (stubAll: Stub.All, pipeline: Pipeline) => {
     const contexts = getContextsBySource(
       stubAll,
       this.allowedSource ? this.allowedSource : pipeline.source,
       this.rootPath,
-      pipeline.enable,
-      pipeline.special
+      pipeline
     )
 
     for (const ctx of contexts) {
@@ -117,143 +84,20 @@ export interface RenderContext {
   controller?: Stub.Controller,
   action?: Stub.Action,
   model?: Stub.Model,
-}
-
-export const getContextsBySource = (
-  stubAll: Stub.All,
-  source: string | null,
-  path: string,
-  enable: string | null,
-  special: string | null
-): RenderContext[] => {
-  const specialTemplate = special ? stubAll.specials[special] : null
-
-  if (source === AllowedSource.tempate) {
-    if (special && specialTemplate) {
-      return [{
-        path,
-        all: stubAll,
-        template: specialTemplate
-      }]
-    }
-
-    return stubAll.templates.map(template => {
-      return {
-        path,
-        all: stubAll,
-        template,
-      }
-    })
-  }
-
-  if (source === AllowedSource.model) {
-    if (special && specialTemplate) {
-      return specialTemplate.models.map(model => {
-        return {
-          path,
-          all: stubAll,
-          template: specialTemplate,
-          model,
-        }
-      })
-    }
-
-    const res: RenderContext[] = []
-
-    stubAll.templates.forEach(template => {
-      template.models.forEach(model => {
-        if (enable && !model.annotation[enable]) {
-          return
-        }
-
-        res.push({
-          path,
-          all: stubAll,
-          template,
-          model,
-        })
-      })
-    })
-
-    return res
-  }
-
-  if (source === AllowedSource.controller) {
-    if (special && specialTemplate) {
-      return specialTemplate.controllers.map(controller => {
-        return {
-          path,
-          all: stubAll,
-          template: specialTemplate,
-          controller,
-        }
-      })
-    }
-  }
-
-  if (source === AllowedSource.action) {
-    if (special && specialTemplate) {
-      const res: RenderContext[] = []
-
-      specialTemplate.controllers.forEach(controller => {
-        controller.actions.forEach(action => {
-          res.push({
-            path,
-            all: stubAll,
-            template: specialTemplate,
-            controller,
-            action,
-          })
-        })
-      })
-
-      return res
-    }
-  }
-
-  return [{
-    path,
-    all: stubAll,
-  }]
-}
-
-const getEngine = (liquidTemplatePath: string) => {
-  const liquid = new Liquid({
-    root: path.resolve(liquidTemplatePath),
-    extname: '.liquid',
-  });
-
-  liquid.registerFilter('camelcase', (value: string) => {
-    return _.camelCase(value)
-  })
-
-  liquid.registerFilter('snakecase', (value: string) => {
-    return _.snakeCase(value)
-  })
-
-  liquid.registerFilter('lcfirst', (value: string) => {
-    return _.lowerFirst(value)
-  })
-
-  liquid.registerFilter('ucfirst', (value: string) => {
-    return _.upperFirst(value)
-  })
-
-  return liquid
+  enum?: Stub.Enum,
+  pipeline: Pipeline,
 }
 
 interface Config {
   path: string
   pipelines: Pipeline[]
-  filters: { [key: string]: { [key: string]: string } }
+  filters: LiquidFilters
 }
 
 export interface Pipeline {
   type: string
-  source: string | null
+  source: AllowedSource | null
   special: string | null
-  stub: string | null
-  path: string | null
   enable: string | null
 }
 
@@ -261,45 +105,17 @@ export enum AllowedSource {
   all = 'all',
   tempate = 'template',
   model = 'model',
-  controller = '',
+  controller = 'controller',
   action = 'action',
+  enum = 'enum',
+  constant = 'constant',
 }
 
 export namespace Stub {
   export type Annotations = { [key: string]: any }
 
   export class Base {
-    assertStubAll() {
-      return this as unknown as All
-    }
-
-    assertStubTemplate() {
-      return this as unknown as Template
-    }
-
-    assertStubEnum() {
-      return this as unknown as Enum
-    }
-
-    assertStubEnumItem() {
-      return this as unknown as EnumItem
-    }
-
-    assertStubController() {
-      return this as unknown as Controller
-    }
-
-    assertStubAction() {
-      return this as unknown as Action
-    }
-
-    assertStubModel() {
-      return this as unknown as Model
-    }
-
-    assertStubParameter() {
-      return this as unknown as Parameter
-    }
+    public comment: string[] = []
   }
 
   export class All extends Base {
@@ -307,7 +123,7 @@ export namespace Stub {
     public specials: { [key: string]: Stub.Template } = {}
   }
 
-  class CommonNamed extends Base {
+  class Named extends Base {
     public name: string
 
     constructor(name: string) {
@@ -317,41 +133,40 @@ export namespace Stub {
     }
   }
 
-  export class Template extends CommonNamed {
+  export class Template extends Named {
     public enums: Stub.Enum[] = []
     public models: Stub.Model[] = []
     public controllers: Stub.Controller[] = []
   }
 
-  class CommonNamedWithCommentAndAnnotation extends CommonNamed {
-    public comment: string[] = []
+  class NamedWithAnnotation extends Named {
     public annotation: Stub.Annotations = {}
   }
 
-  export class Enum extends CommonNamedWithCommentAndAnnotation {
+  export class Enum extends NamedWithAnnotation {
     items: EnumItem[] = []
   }
 
-  export class EnumItem extends CommonNamedWithCommentAndAnnotation {
+  export class EnumItem extends NamedWithAnnotation {
     value: string = ''
   }
 
-  export class Controller extends CommonNamedWithCommentAndAnnotation {
+  export class Controller extends NamedWithAnnotation {
     actions: Stub.Action[] = []
   }
 
-  export class Action extends CommonNamedWithCommentAndAnnotation {
+  export class Action extends NamedWithAnnotation {
     extends: string | null = null
     requests: Stub.Parameter[] = []
     responses: Stub.Parameter[] = []
   }
 
-  export class Model extends CommonNamedWithCommentAndAnnotation {
+  export class Model extends NamedWithAnnotation {
     parameters: any[] = []
     extends: string | null = null
   }
 
-  export class Parameter extends CommonNamedWithCommentAndAnnotation {
+  export class Parameter extends NamedWithAnnotation {
     nullable: boolean = false
     type: string = ''
     is_array: boolean = false

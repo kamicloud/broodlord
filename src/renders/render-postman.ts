@@ -1,18 +1,14 @@
-import { AllowedSource, BaseRender, Pipeline, RenderContext } from "../render";
+import { AllowedSource, BaseRender, Pipeline, RenderContext, Stub } from "../render";
 import path from 'path'
 
 export default class extends BaseRender {
   public name = 'postman'
   public allowedSource: AllowedSource | null = AllowedSource.tempate
-  assertConfig(ctx: RenderContext, pipeline: Pipeline): boolean {
+  assertConfig(ctx: RenderContext, pipeline: PostmanConfig): boolean {
     return !!pipeline.path
   }
-  render(ctx: RenderContext, pipeline: Pipeline) {
-    const stubTemplate = ctx.template
-
-    if (!stubTemplate) {
-      return
-    }
+  render(ctx: RenderContext, pipeline: PostmanConfig) {
+    const stubTemplate = ctx.template as Stub.Template
 
     const postmanStub: PostmanStub = {
       info: {
@@ -72,7 +68,7 @@ export default class extends BaseRender {
       postmanStub.item.push(postmanItemStub)
     })
 
-    const finalPath = path.resolve(this.rootPath, pipeline.path as string, `${stubTemplate.name.toLowerCase()}_postman.json`)
+    const finalPath = path.resolve(this.rootPath, pipeline.path, `${stubTemplate.name.toLowerCase()}_postman.json`)
 
     this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2).replace("\r\n", "\n") + "\n")
   }
@@ -126,4 +122,8 @@ interface PostmanParameterStub {
   type: string
   description: string
   disabled: boolean
+}
+
+interface PostmanConfig extends Pipeline {
+  path: string
 }

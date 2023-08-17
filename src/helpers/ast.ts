@@ -86,10 +86,10 @@ export const getAnnotation = (ast: ts.Node, sourceFile: ts.SourceFile) => {
     }
 
     ast.forEachChild((annotationAST) => {
-      const annotation = annotationAST.getChildAt(0, sourceFile)
+      const annotation = annotationAST.getChildAt(0, sourceFile) || annotationAST
       const param = annotationAST.getChildAt(2, sourceFile)
 
-      const annotationText = annotation.getText(sourceFile);
+      const annotationText = annotation?.getText(sourceFile);
 
       if (annotationText === 'methods') {
         const methods: string[] = [];
