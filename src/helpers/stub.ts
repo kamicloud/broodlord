@@ -3,64 +3,49 @@ import _ from 'lodash'
 import { Liquid } from 'liquidjs'
 import path from 'path'
 
-export const getContextsBySource = (
+const getContextByTemplate = (
   stubAll: Stub.All,
   source: string | null,
   path: string,
   pipeline: Pipeline,
+  template: Stub.Template
 ): RenderContext[] => {
-  const {enable, special} = pipeline
-  const specialTemplate = special ? stubAll.specials[special] : null
+  const { enable } = pipeline
   const enableAnnotation = enable
 
-  if (source === AllowedSource.tempate) {
-    if (special && specialTemplate) {
-      return [{
-        path,
-        all: stubAll,
-        template: specialTemplate,
-        pipeline,
-      }]
-    }
+  const basic = {
+    path,
+    all: stubAll,
+    template,
+    pipeline,
+  }
 
-    return stubAll.templates.map(template => {
+  if (source === AllowedSource.tempate) {
+    return [{
+      ...basic,
+    }]
+  }
+
+  if (source === AllowedSource.enum) {
+    return template.enums.map(stubEnum => {
       return {
-        path,
-        all: stubAll,
-        template,
-        pipeline,
+        ...basic,
+        enum: stubEnum,
       }
     })
   }
 
   if (source === AllowedSource.model) {
-    if (special && specialTemplate) {
-      return specialTemplate.models.map(model => {
-        return {
-          path,
-          all: stubAll,
-          template: specialTemplate,
-          model,
-          pipeline,
-        }
-      })
-    }
-
     const res: RenderContext[] = []
 
-    stubAll.templates.forEach(template => {
-      template.models.forEach(model => {
-        if (enableAnnotation && !model.annotation[enableAnnotation]) {
-          return
-        }
+    template.models.forEach(model => {
+      if (enableAnnotation && !model.annotation[enableAnnotation]) {
+        return
+      }
 
-        res.push({
-          path,
-          all: stubAll,
-          template,
-          model,
-          pipeline,
-        })
+      res.push({
+        ...basic,
+        model,
       })
     })
 
@@ -68,45 +53,73 @@ export const getContextsBySource = (
   }
 
   if (source === AllowedSource.controller) {
-    if (special && specialTemplate) {
-      return specialTemplate.controllers.map(controller => {
-        return {
-          path,
-          all: stubAll,
-          template: specialTemplate,
-          controller,
-          pipeline,
-        }
+    const res: RenderContext[] = []
+
+    template.controllers.forEach(controller => {
+      res.push({
+        ...basic,
+        controller,
       })
-    }
+    })
+
+    return res
   }
 
   if (source === AllowedSource.action) {
-    if (special && specialTemplate) {
-      const res: RenderContext[] = []
+    const res: RenderContext[] = []
 
-      specialTemplate.controllers.forEach(controller => {
-        controller.actions.forEach(action => {
-          res.push({
-            path,
-            all: stubAll,
-            template: specialTemplate,
-            controller,
-            action,
-            pipeline,
-          })
+    template.controllers.forEach(controller => {
+      controller.actions.forEach(action => {
+        if (enableAnnotation && !action.annotation[enableAnnotation]) {
+          return
+        }
+
+        res.push({
+          ...basic,
+          controller,
+          action,
         })
       })
+    })
 
-      return res
-    }
+    return res
   }
 
-  return [{
-    path,
-    all: stubAll,
-    pipeline,
-  }]
+  return [basic]
+}
+
+export const getContextsBySource = (
+  stubAll: Stub.All,
+  source: string | null,
+  path: string,
+  pipeline: Pipeline,
+): RenderContext[] => {
+  const { special } = pipeline
+  const specialTemplate = special ? stubAll.specials[special] : null
+
+  if (special && specialTemplate) {
+    return getContextByTemplate(
+      stubAll,
+      source,
+      path,
+      pipeline,
+      specialTemplate,
+    )
+  }
+
+  const res: RenderContext[] = []
+
+  stubAll.templates.forEach(template => {
+    res.push(...getContextByTemplate(
+      stubAll,
+      source,
+      path,
+      pipeline,
+      template,
+    ))
+  })
+
+  return res
 }
 
 export const useLiquid = (liquidTemplatePath: string, filters: LiquidFilters) => {

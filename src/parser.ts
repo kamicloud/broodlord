@@ -1,5 +1,5 @@
 import ts, { SyntaxKind } from "typescript";
-import { getAnnotation, getBasicTypeByKind, getComment, getName, getTypeFromTypeReference } from './helpers/ast'
+import { getAnnotation, getBasicTypeByKind, getComment, getName, getTypeFromTypeReference, writeASTFile } from './helpers/ast'
 import path from 'path'
 import { Stub } from './render'
 
@@ -124,90 +124,62 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
 
             return
           }
+
+          if (parameterAST.kind === SyntaxKind.TypeLiteral) {
+            parameterAST.getChildren(sourceFile).forEach(parameterTypeAST => {
+              if (parameterTypeAST.kind === SyntaxKind.SyntaxList) {
+                parameterTypeAST.getChildren(sourceFile).forEach(mapAST => {
+                  // map
+                  if (mapAST.kind === SyntaxKind.IndexSignature) {
+                    stubParameter.is_map = true
+                      const keyAST = mapAST.getChildAt(1, sourceFile)
+                      const valueAST = mapAST.getChildAt(4, sourceFile)
+
+                      const guessType = getBasicTypeByKind(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).kind)
+
+                      console.log(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).getText(sourceFile), guessType)
+                      if (guessType) {
+                        stubParameter.key_type = guessType
+                      }
+
+                      decideType(valueAST)
+                  }
+                })
+              }
+            })
+          }
+        }
+
+        const handleIfArray = (typeAST: ts.Node) => {
+          stubParameter.is_array = true
+
+          decideType(typeAST)
         }
 
         if (parameterAST.kind === SyntaxKind.UnionType) {
-          parameterAST.forEachChild(parameterTypeAST => {
-            if (parameterTypeAST.kind === SyntaxKind.TypeReference) {
-              const relatedType = parameterTypeAST.getChildAt(0, sourceFile).getText(sourceFile)
+          const childAST = parameterAST.getChildAt(0, sourceFile)
+          const typeAST = childAST.getChildAt(0, sourceFile)
 
-              if (relatedType.startsWith('Enums')) {
-                stubParameter.is_enum = true
-              } else if (relatedType.startsWith('Models')) {
-                stubParameter.is_model = true
-              }
+          const nullableAST = childAST.getChildAt(2, sourceFile)
 
-              stubParameter.type = getTypeFromTypeReference(parameterTypeAST, sourceFile);
+          // console.log(childAST, childAST.getText(sourceFile))
+          if (nullableAST.getText(sourceFile) === 'null') {
+            stubParameter.nullable = true
+          }
 
-              return;
-            }
+          if (typeAST.kind === SyntaxKind.ArrayType) {
+            handleIfArray(typeAST.getChildAt(0, sourceFile))
 
-            if (parameterTypeAST.kind === SyntaxKind.ArrayType) {
-              stubParameter.is_array = true
-              stubParameter.type = parameterTypeAST.getChildAt(0, sourceFile)?.getText(sourceFile)
+            return;
+          }
 
-              return;
-            }
-
-            decideType(parameterTypeAST)
-
-            if (parameterTypeAST.kind === SyntaxKind.LiteralType) {
-              if (parameterTypeAST.getText(sourceFile) === 'null') {
-                stubParameter.nullable = true
-
-                return;
-              }
-
-              stubParameter.type = parameterTypeAST.getChildAt(0, sourceFile)?.getText(sourceFile)
-
-              return
-            }
-
-          })
+          decideType(typeAST)
 
           return
         }
 
         if (parameterAST.kind === SyntaxKind.ArrayType) {
-          stubParameter.is_array = true
-
-          const relatedType = parameterAST.getChildAt(0, sourceFile).getText(sourceFile)
-
-          parameterAST.forEachChild(parameterTypeAST => {
-            if (parameterTypeAST.kind === SyntaxKind.TypeReference) {
-              stubParameter.type = getTypeFromTypeReference(parameterTypeAST, sourceFile);
-
-              parameterTypeAST.forEachChild(parameterTypeAST2 => {
-                if (parameterTypeAST2.kind === SyntaxKind.QualifiedName) {
-                  const relatedType = parameterTypeAST2.getChildAt(0, sourceFile).getText(sourceFile)
-
-                  if (relatedType === 'Enums') {
-                    stubParameter.is_enum = true
-                  } else if (relatedType === 'Models') {
-                    stubParameter.is_model = true
-                  }
-
-                  return;
-                }
-              })
-
-              return;
-            }
-
-            const guessType = getBasicTypeByKind(parameterTypeAST.kind)
-
-            if (guessType !== null) {
-              stubParameter.type = guessType
-
-              return
-            }
-          })
-
-          if (relatedType === 'Enums') {
-            stubParameter.is_enum = true
-          } else if (relatedType === 'Models') {
-            stubParameter.is_model = true
-          }
+          handleIfArray(parameterAST.getChildAt(0, sourceFile))
 
           return
         }

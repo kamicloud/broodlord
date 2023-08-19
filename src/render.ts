@@ -1,48 +1,7 @@
 import { Liquid } from "liquidjs";
-import path from 'path'
 import _ from "lodash";
 import fs from './helpers/fs'
 import { getContextsBySource, useLiquid, LiquidFilters } from './helpers/stub'
-
-export default async (name: string, stubAll: Stub.All) => {
-  const c = require('config')
-
-  const realRootPath = path.resolve(c.config?.output_root_path || '')
-  const liquidTemplatePath = path.resolve(c.config?.liquid_template_path || `${c.template_path}/../stubs`)
-
-  const config = c.get(name) as Config
-
-  const rootPath = path.resolve(realRootPath, config.path)
-  const pipelines = config.pipelines
-  const filters = config.filters
-
-  const renders: { [key: string]: BaseRender } = {}
-  const liquid = useLiquid(liquidTemplatePath, filters)
-
-  const registerRender = (render: any) => {
-    const r = new render(rootPath, liquid)
-
-    renders[r.name] = r
-  }
-
-  registerRender(require(__dirname + '/renders/render-ast').default)
-  registerRender(require(__dirname + '/renders/render-liquid').default)
-  registerRender(require(__dirname + '/renders/render-openapi').default)
-  registerRender(require(__dirname + '/renders/render-postman').default)
-  registerRender(require(__dirname + '/renders/render-remove').default)
-
-  // pipelines
-  pipelines.forEach((pipeline) => {
-    const render = renders[pipeline.type]
-
-    if (!render) {
-
-      return
-    }
-
-    render.process(stubAll, pipeline)
-  })
-}
 
 export abstract class BaseRender {
   public name = ''
@@ -80,7 +39,7 @@ export abstract class BaseRender {
 export interface RenderContext {
   path: string,
   all: Stub.All,
-  template?: Stub.Template,
+  template: Stub.Template,
   controller?: Stub.Controller,
   action?: Stub.Action,
   model?: Stub.Model,
@@ -88,7 +47,7 @@ export interface RenderContext {
   pipeline: Pipeline,
 }
 
-interface Config {
+export interface Config {
   path: string
   pipelines: Pipeline[]
   filters: LiquidFilters
@@ -104,11 +63,11 @@ export interface Pipeline {
 export enum AllowedSource {
   all = 'all',
   tempate = 'template',
+  constant = 'constant',
+  enum = 'enum',
   model = 'model',
   controller = 'controller',
   action = 'action',
-  enum = 'enum',
-  constant = 'constant',
 }
 
 export namespace Stub {
@@ -172,5 +131,8 @@ export namespace Stub {
     is_array: boolean = false
     is_model: boolean = false
     is_enum: boolean = false
+
+    is_map: boolean = false
+    key_type: string = ''
   }
 }

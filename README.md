@@ -6,14 +6,14 @@ Broodlord is a lightweight MVC code rendering engine based on typescript. Render
 
 ##### Main
 
-- Versions
+- Templates
   - Template
 
 - Specials
   - Template
 
 ##### Template
-- Constants
+- Constants (In progress)
 - Enums
 - Models
   - - Parameters
@@ -21,6 +21,16 @@ Broodlord is a lightweight MVC code rendering engine based on typescript. Render
   - Actions
     - Requests
     - Responses
+
+##### Parameter / Request / Response
+- nullable
+- is_array
+- is_map
+- is_enum
+- is_model
+- key_type
+- type
+
 
 ## Config
 

@@ -23,7 +23,7 @@ export const writeASTFile = (astTargetPath: string, sourceFile: ts.SourceFile) =
       cache.push(value);
     }
     return value;
-  }))
+  }, 2))
 }
 
 export const getBasicTypeByKind = (kind: SyntaxKind) => {
