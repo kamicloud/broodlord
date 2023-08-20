@@ -77,11 +77,16 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
     stubModel.annotation = getAnnotation(ast, sourceFile)
 
     ast.forEachChild(modelAST => {
+      if (modelAST.kind === SyntaxKind.Decorator) {
+        return;
+      }
+
       const stubParameter = new Stub.Parameter(getName(modelAST, sourceFile))
 
       stubParameter.comment = getComment(modelAST)
       stubParameter.annotation = getAnnotation(modelAST, sourceFile)
 
+      // extends
       if (modelAST.kind === SyntaxKind.HeritageClause) {
         // console.log(modelAST)
         stubModel.extends = modelAST.getChildAt(1, sourceFile).getText(sourceFile)
@@ -137,7 +142,6 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
 
                       const guessType = getBasicTypeByKind(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).kind)
 
-                      console.log(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).getText(sourceFile), guessType)
                       if (guessType) {
                         stubParameter.key_type = guessType
                       }
@@ -156,6 +160,7 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
           decideType(typeAST)
         }
 
+        // type | null
         if (parameterAST.kind === SyntaxKind.UnionType) {
           const childAST = parameterAST.getChildAt(0, sourceFile)
           const typeAST = childAST.getChildAt(0, sourceFile)
@@ -178,6 +183,7 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
           return
         }
 
+        // array
         if (parameterAST.kind === SyntaxKind.ArrayType) {
           handleIfArray(parameterAST.getChildAt(0, sourceFile))
 
@@ -313,10 +319,12 @@ export const manage = (stubTemplate: Stub.Template) => {
     return stubAction.responses
   }
 
+  // prepare data for modeal extends
   stubTemplate.models.forEach(stubModel => {
     modelsMap[stubModel.name] = stubModel
   })
 
+  // model extends
   stubTemplate.models.forEach(stubModel => {
     if (stubModel.extends) {
       stubModel.parameters = getParametersRecurse(stubModel)
@@ -329,12 +337,14 @@ export const manage = (stubTemplate: Stub.Template) => {
     })
   })
 
+  // prepare data for extends
   stubTemplate.controllers.forEach(stubTemplateController => {
     stubTemplateController.actions.forEach(stubTemplateControllerAction => {
       actionsMap[`${stubTemplateController.name}.${stubTemplateControllerAction.name}`] = stubTemplateControllerAction
     })
   })
 
+  // action extends
   stubTemplate.controllers.forEach(stubTemplateController => {
     stubTemplateController.actions.forEach(stubTemplateControllerAction => {
       if (stubTemplateControllerAction.extends) {
@@ -348,7 +358,26 @@ export const manage = (stubTemplate: Stub.Template) => {
       const requests: Stub.Parameter[] = [];
       const responses: Stub.Parameter[] = [];
 
-      stubTemplateControllerAction.responses.forEach(stubTemplateControllerActionResponse => {
+      // __request & __response
+      const excludeMagicParameters = stubTemplateControllerAction.responses.filter((stubParameter) => {
+        if (stubParameter.name === '__request' && stubParameter.is_model && modelsMap[stubParameter.type]) {
+          modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
+            requests.push(stubModelParameter)
+          })
+
+          return false;
+        }
+
+        if (stubParameter.name === '__response' && stubParameter.is_model && modelsMap[stubParameter.type]) {
+          modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
+            responses.push(stubModelParameter)
+          })
+
+          return false
+        }
+      })
+
+      excludeMagicParameters.forEach(stubTemplateControllerActionResponse => {
         if (stubTemplateControllerActionResponse.annotation.request) {
           requests.push(stubTemplateControllerActionResponse)
         } else {

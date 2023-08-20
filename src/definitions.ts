@@ -17,3 +17,5 @@ export enum Method {
   PATCH,
   DELETE
 }
+
+export * from './render'

@@ -3,11 +3,11 @@ import path from 'path'
 
 export default class extends BaseRender {
   public name = 'copy'
-  assertConfig(ctx: RenderContext, pipeline: CopyConfig): boolean {
-    return !!(pipeline.src && pipeline.dest)
+  assertConfig(ctx: RenderContext<CopyConfig>): boolean {
+    return !!(ctx.pipeline.src && ctx.pipeline.dest)
   }
-  render(ctx: RenderContext, pipeline: CopyConfig) {
-    this.fs.copyFile(path.resolve(pipeline.src), path.resolve(pipeline.dest))
+  render(ctx: RenderContext<CopyConfig>) {
+    this.fs.copyFile(path.resolve(ctx.pipeline.src), path.resolve(ctx.pipeline.dest))
   }
 }
 

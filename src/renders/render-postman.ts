@@ -4,10 +4,10 @@ import path from 'path'
 export default class extends BaseRender {
   public name = 'postman'
   public allowedSource: AllowedSource | null = AllowedSource.tempate
-  assertConfig(ctx: RenderContext, pipeline: PostmanConfig): boolean {
-    return !!pipeline.path
+  assertConfig(ctx: RenderContext<PostmanConfig>): boolean {
+    return !!ctx.pipeline.path
   }
-  render(ctx: RenderContext, pipeline: PostmanConfig) {
+  render(ctx: RenderContext<PostmanConfig>) {
     const stubTemplate = ctx.template as Stub.Template
 
     const postmanStub: PostmanStub = {
@@ -68,7 +68,7 @@ export default class extends BaseRender {
       postmanStub.item.push(postmanItemStub)
     })
 
-    const finalPath = path.resolve(this.rootPath, pipeline.path, `${stubTemplate.name.toLowerCase()}_postman.json`)
+    const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_postman.json`)
 
     this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2).replace("\r\n", "\n") + "\n")
   }

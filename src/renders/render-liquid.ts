@@ -4,12 +4,12 @@ import { BaseRender, Pipeline, RenderContext, AllowedSource } from "../render";
 export default class extends BaseRender {
   public name = 'render'
 
-  assertConfig(ctx: RenderContext, pipeline: LiquidConfig): boolean {
-    return !!(pipeline && pipeline.stub && pipeline.source)
+  assertConfig(ctx: RenderContext<LiquidConfig>): boolean {
+    return !!(ctx.pipeline && ctx.pipeline.stub && ctx.pipeline.source)
   }
 
-  render(ctx: RenderContext, pipeline: LiquidConfig): void {
-    const stub = pipeline.stub
+  render(ctx: RenderContext<LiquidConfig>): void {
+    const stub = ctx.pipeline.stub
     const content = this.liquid.renderFileSync(stub, ctx);
 
     const contents = content.replace("\r\n", "\n").split("\n")

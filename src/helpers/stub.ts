@@ -9,9 +9,10 @@ const getContextByTemplate = (
   path: string,
   pipeline: Pipeline,
   template: Stub.Template
-): RenderContext[] => {
+): RenderContext<Pipeline>[] => {
   const { enable } = pipeline
   const enableAnnotation = enable
+  const res: RenderContext<Pipeline>[] = []
 
   const basic = {
     path,
@@ -36,8 +37,6 @@ const getContextByTemplate = (
   }
 
   if (source === AllowedSource.model) {
-    const res: RenderContext[] = []
-
     template.models.forEach(model => {
       if (enableAnnotation && !model.annotation[enableAnnotation]) {
         return
@@ -53,8 +52,6 @@ const getContextByTemplate = (
   }
 
   if (source === AllowedSource.controller) {
-    const res: RenderContext[] = []
-
     template.controllers.forEach(controller => {
       res.push({
         ...basic,
@@ -66,8 +63,6 @@ const getContextByTemplate = (
   }
 
   if (source === AllowedSource.action) {
-    const res: RenderContext[] = []
-
     template.controllers.forEach(controller => {
       controller.actions.forEach(action => {
         if (enableAnnotation && !action.annotation[enableAnnotation]) {
@@ -93,7 +88,7 @@ export const getContextsBySource = (
   source: string | null,
   path: string,
   pipeline: Pipeline,
-): RenderContext[] => {
+): RenderContext<Pipeline>[] => {
   const { special } = pipeline
   const specialTemplate = special ? stubAll.specials[special] : null
 
@@ -107,7 +102,7 @@ export const getContextsBySource = (
     )
   }
 
-  const res: RenderContext[] = []
+  const res: RenderContext<Pipeline>[] = []
 
   stubAll.templates.forEach(template => {
     res.push(...getContextByTemplate(

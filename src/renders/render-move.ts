@@ -3,11 +3,11 @@ import path from 'path'
 
 export default class extends BaseRender {
   public name = 'move'
-  assertConfig(ctx: RenderContext, pipeline: MoveConfig): boolean {
-    return !!(pipeline.src && pipeline.dest)
+  assertConfig(ctx: RenderContext<MoveConfig>): boolean {
+    return !!(ctx.pipeline.src && ctx.pipeline.dest)
   }
-  render(ctx: RenderContext, pipeline: MoveConfig) {
-    this.fs.rename(path.resolve(pipeline.src), path.resolve(pipeline.dest))
+  render(ctx: RenderContext<MoveConfig>) {
+    this.fs.rename(path.resolve(ctx.pipeline.src), path.resolve(ctx.pipeline.dest))
   }
 }
 

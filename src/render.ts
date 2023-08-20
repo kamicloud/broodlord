@@ -1,7 +1,7 @@
 import { Liquid } from "liquidjs";
 import _ from "lodash";
 import fs from './helpers/fs'
-import { getContextsBySource, useLiquid, LiquidFilters } from './helpers/stub'
+import { getContextsBySource, LiquidFilters } from './helpers/stub'
 
 export abstract class BaseRender {
   public name = ''
@@ -24,19 +24,19 @@ export abstract class BaseRender {
     )
 
     for (const ctx of contexts) {
-      if (!this.assertConfig(ctx, pipeline)) {
+      if (!this.assertConfig(ctx)) {
         continue
       }
 
-      this.render(ctx, pipeline)
+      this.render(ctx)
     }
   }
 
-  abstract assertConfig(ctx: RenderContext, pipeline: Pipeline): boolean
-  abstract render(ctx: RenderContext, pipeline: Pipeline): void
+  abstract assertConfig(ctx: RenderContext<Pipeline>): boolean
+  abstract render(ctx: RenderContext<Pipeline>): void
 }
 
-export interface RenderContext {
+export interface RenderContext<T extends Pipeline> {
   path: string,
   all: Stub.All,
   template: Stub.Template,
@@ -44,7 +44,7 @@ export interface RenderContext {
   action?: Stub.Action,
   model?: Stub.Model,
   enum?: Stub.Enum,
-  pipeline: Pipeline,
+  pipeline: T,
 }
 
 export interface Config {

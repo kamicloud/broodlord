@@ -4,10 +4,10 @@ import path from 'path'
 export default class extends BaseRender {
   public name = 'openapi'
   public allowedSource: AllowedSource | null = AllowedSource.tempate
-  assertConfig(ctx: RenderContext, pipeline: OpenapiConfig): boolean {
-    return !!(pipeline.path && ctx.template)
+  assertConfig(ctx: RenderContext<OpenapiConfig>): boolean {
+    return !!(ctx.pipeline.path && ctx.template)
   }
-  render(ctx: RenderContext, pipeline: OpenapiConfig): void {
+  render(ctx: RenderContext<OpenapiConfig>): void {
     const stubTemplate = ctx.template as Stub.Template
 
     const openapi: any = {
@@ -214,7 +214,7 @@ export default class extends BaseRender {
     })
     handleControllerAST()
 
-    const finalPath = path.resolve(this.rootPath, pipeline.path, `${stubTemplate.name.toLowerCase()}_openapi.json`)
+    const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_openapi.json`)
 
     this.fs.writeFile(finalPath, JSON.stringify(openapi, null, 2).replace("\r\n", "\n") + "\n")
   }
