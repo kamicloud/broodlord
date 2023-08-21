@@ -106,7 +106,14 @@ export namespace Stub {
     items: EnumItem[] = []
   }
 
+  export enum EnumItemType {
+    string = 'string',
+    int = 'int',
+    float = 'float',
+  }
+
   export class EnumItem extends NamedWithAnnotation {
+    type: EnumItemType = EnumItemType.string
     value: string = ''
   }
 

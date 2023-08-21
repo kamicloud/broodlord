@@ -47,19 +47,21 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
 
       stubEnumItem.comment = getComment(enumAST)
       stubEnumItem.annotation = getAnnotation(enumAST, sourceFile)
+
+      // default to name
+      stubEnumItem.type = Stub.EnumItemType.string
       stubEnumItem.value = getName(enumAST, sourceFile)
 
       if (enumAST.kind === SyntaxKind.EnumMember) {
         // enum item name
-        enumAST.forEachChild(enumItemAST => {
-          if (enumItemAST.kind === SyntaxKind.StringLiteral) {
-            const text = (enumItemAST as any).text
+        const value = enumAST.getChildAt(2, sourceFile)
 
-            stubEnumItem.value = text !== '' ? text : stubEnumItem.name
+        if (!value) {
+          return
+        }
 
-            return
-          }
-        })
+        stubEnumItem.type = value.kind === SyntaxKind.StringLiteral ? Stub.EnumItemType.string : Stub.EnumItemType.int
+        stubEnumItem.value = (value as any).text
 
         stubEnum.items.push(stubEnumItem)
 
@@ -375,6 +377,8 @@ export const manage = (stubTemplate: Stub.Template) => {
 
           return false
         }
+
+        return true
       })
 
       excludeMagicParameters.forEach(stubTemplateControllerActionResponse => {
