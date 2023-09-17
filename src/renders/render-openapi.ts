@@ -3,7 +3,7 @@ import path from 'path'
 
 export default class extends BaseRender {
   public name = 'openapi'
-  public allowedSource: AllowedSource | null = AllowedSource.tempate
+  public allowedSource: AllowedSource | null = AllowedSource.template
   assertConfig(ctx: RenderContext<OpenapiConfig>): boolean {
     return !!(ctx.pipeline.path && ctx.template)
   }

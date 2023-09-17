@@ -21,7 +21,7 @@ const getContextByTemplate = (
     pipeline,
   }
 
-  if (source === AllowedSource.tempate) {
+  if (source === AllowedSource.template) {
     return [{
       ...basic,
     }]
@@ -119,7 +119,10 @@ export const getContextsBySource = (
 
 export const useLiquid = (liquidTemplatePath: string, filters: LiquidFilters) => {
   const liquid = new Liquid({
-    root: path.resolve(liquidTemplatePath),
+    root: [
+      path.resolve(__dirname + '/../../stubs'),
+      path.resolve(liquidTemplatePath),
+    ],
     extname: '.liquid',
   });
 

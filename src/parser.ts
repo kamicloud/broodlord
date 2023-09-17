@@ -1,5 +1,5 @@
 import ts, { SyntaxKind } from "typescript";
-import { getAnnotation, getBasicTypeByKind, getComment, getName, getTypeFromTypeReference, writeASTFile } from './helpers/ast'
+import { getAnnotation, getBasicTypeByKind, getComment, getName } from './helpers/ast'
 import path from 'path'
 import { Stub } from './render'
 
@@ -12,9 +12,9 @@ const getTemplate = (template_path: string, name: string) => {
 
   const sourceFile = program.getSourceFile(filename) as ts.SourceFile;
 
-  const stubTemplate = parse(name, sourceFile)
+  const stubTemplate = parseTemplate(name, sourceFile)
 
-  manage(stubTemplate)
+  manageTemplate(stubTemplate)
 
   return stubTemplate
 }
@@ -33,7 +33,7 @@ export const parseAll = (template_path: string, templates: string[], specials: s
   return all
 }
 
-export const parse = (name: string, sourceFile: ts.SourceFile) => {
+export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
   const stubTemplate = new Stub.Template(name)
 
   const handleEnumAST = (ast: ts.Node) => {
@@ -295,7 +295,7 @@ export const parse = (name: string, sourceFile: ts.SourceFile) => {
   return stubTemplate
 }
 
-export const manage = (stubTemplate: Stub.Template) => {
+export const manageTemplate = (stubTemplate: Stub.Template) => {
   const modelsMap: { [key: string]: Stub.Model } = {}
   const actionsMap: { [key: string]: Stub.Action } = {}
 
@@ -357,6 +357,30 @@ export const manage = (stubTemplate: Stub.Template) => {
 
   stubTemplate.controllers.forEach(stubTemplateController => {
     stubTemplateController.actions.forEach(stubTemplateControllerAction => {
+      if (stubTemplateControllerAction.annotation.methods) {
+        stubTemplateControllerAction.annotation.methods.forEach((method: string) => {
+          if (method === 'OPTION') {
+            stubTemplateControllerAction.method.OPTION = true
+          }
+          if (method === 'GET') {
+            stubTemplateControllerAction.method.GET = true
+          }
+          if (method === 'POST') {
+            stubTemplateControllerAction.method.POST = true
+          }
+          if (method === 'PUT') {
+            stubTemplateControllerAction.method.PUT = true
+          }
+          if (method === 'PATCH') {
+            stubTemplateControllerAction.method.PATCH = true
+          }
+          if (method === 'DELETE') {
+            stubTemplateControllerAction.method.DELETE = true
+          }
+
+          stubTemplateControllerAction.methods.push(method)
+        })
+      }
       const requests: Stub.Parameter[] = [];
       const responses: Stub.Parameter[] = [];
 

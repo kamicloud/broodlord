@@ -62,7 +62,7 @@ export interface Pipeline {
 
 export enum AllowedSource {
   all = 'all',
-  tempate = 'template',
+  template = 'template',
   constant = 'constant',
   enum = 'enum',
   model = 'model',
@@ -125,6 +125,23 @@ export namespace Stub {
     extends: string | null = null
     requests: Stub.Parameter[] = []
     responses: Stub.Parameter[] = []
+
+    methods: string[] = []
+    method: {
+      OPTION: boolean,
+      GET: boolean,
+      POST: boolean,
+      PUT: boolean,
+      PATCH: boolean,
+      DELETE: boolean,
+    } = {
+      OPTION: false,
+      GET: false,
+      POST: false,
+      PUT: false,
+      PATCH: false,
+      DELETE: false
+    }
   }
 
   export class Model extends NamedWithAnnotation {
