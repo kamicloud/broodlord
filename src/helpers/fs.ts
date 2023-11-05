@@ -9,7 +9,10 @@ export default {
     })
   },
   copyFile(src: string, dest: string) {
-    fs.copyFileSync(src, dest, fs.constants.COPYFILE_FICLONE_FORCE)
+    fs.cpSync(src, dest, {
+      recursive: true,
+      mode: fs.constants.COPYFILE_FICLONE_FORCE,
+    })
   },
   rename: fs.renameSync,
   writeFile(target: string, data: string) {

@@ -14,10 +14,13 @@ if (!process.env["NODE_CONFIG_DIR"]) {
 
 const config = require('config');
 
+// parse
 const all = parseAll(config.template_path, config.template?.versions || [], config.template?.specials || []);
 
 const enabled = config.enabled
+// validate
 
+// reder
 const render = async (name: string, stubAll: Stub.All) => {
   const c = require('config')
 

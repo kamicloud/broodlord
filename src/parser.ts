@@ -2,6 +2,7 @@ import ts, { SyntaxKind } from "typescript";
 import { getAnnotation, getBasicTypeByKind, getComment, getName } from './helpers/ast'
 import path from 'path'
 import { Stub } from './render'
+import _ from 'lodash'
 
 const getTemplate = (template_path: string, name: string) => {
   const filename = path.resolve(`${template_path}/${name}.ts`);
@@ -54,7 +55,10 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
 
       if (enumAST.kind === SyntaxKind.EnumMember) {
         // enum item name
-        const value = enumAST.getChildAt(2, sourceFile)
+        // when enum item has comment, value will appear at 3rd child
+        const value = enumAST.getChildAt(2, sourceFile)?.kind === SyntaxKind.EqualsToken ?
+          enumAST.getChildAt(3, sourceFile) :
+          enumAST.getChildAt(2, sourceFile)
 
         if (!value) {
           return
@@ -301,10 +305,10 @@ export const manageTemplate = (stubTemplate: Stub.Template) => {
 
   const getParametersRecurse = (stubModel: Stub.Model): Stub.Parameter[] => {
     if (stubModel.extends) {
-      return [
+      return _.uniqBy([
         ...getParametersRecurse(modelsMap[stubModel.extends]),
         ...stubModel.parameters,
-      ]
+      ].reverse(), parameter => parameter.name).reverse()
     }
 
     return stubModel.parameters
@@ -312,10 +316,10 @@ export const manageTemplate = (stubTemplate: Stub.Template) => {
 
   const getResponsesRecurse = (stubAction: Stub.Action): Stub.Parameter[] => {
     if (stubAction.extends && actionsMap[stubAction.extends]) {
-      return [
+      return _.uniqBy([
         ...getResponsesRecurse(actionsMap[stubAction.extends]),
         ...stubAction.responses,
-      ]
+      ].reverse(), action => action.name).reverse()
     }
 
     return stubAction.responses
