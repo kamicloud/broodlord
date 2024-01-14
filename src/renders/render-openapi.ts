@@ -216,7 +216,7 @@ export default class extends BaseRender {
 
     const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_openapi.json`)
 
-    this.fs.writeFile(finalPath, JSON.stringify(openapi, null, 2).replace("\r\n", "\n") + "\n")
+    this.fs.writeFile(finalPath, JSON.stringify(openapi, null, 2) + "\n")
   }
 }
 

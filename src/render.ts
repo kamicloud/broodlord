@@ -126,6 +126,7 @@ export namespace Stub {
     requests: Stub.Parameter[] = []
     responses: Stub.Parameter[] = []
 
+    path: string = ''
     methods: string[] = []
     method: {
       OPTION: boolean,

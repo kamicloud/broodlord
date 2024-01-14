@@ -70,7 +70,7 @@ export default class extends BaseRender {
 
     const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_postman.json`)
 
-    this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2).replace("\r\n", "\n") + "\n")
+    this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2) + "\n")
   }
 }
 

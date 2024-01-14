@@ -68,7 +68,7 @@ export const getComment = (ast: ts.Node): string[] => {
   if ((ast as any).jsDoc) {
     (ast as any).jsDoc.forEach((doc: any) => {
       if (doc.comment) {
-        doc.comment.split("\n").forEach((single_comment: string) => {
+        (doc.comment as string).replace('\r\n', '\n').split("\n").forEach((single_comment: string) => {
           comment.push(single_comment)
         })
       }

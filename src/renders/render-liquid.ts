@@ -12,7 +12,7 @@ export default class extends BaseRender {
     const stub = ctx.pipeline.stub
     const content = this.liquid.renderFileSync(stub, ctx);
 
-    const contents = content.replace("\r\n", "\n").split("\n")
+    const contents = content.split("\n")
 
     const finalPath = path.resolve(this.rootPath, contents[0].trim())
 

@@ -20,7 +20,7 @@ export default {
       recursive: true
     })
 
-    fs.writeFileSync(target, data, {
+    fs.writeFileSync(target, data.trimEnd() + '\n', {
       flag: 'w+'
     })
   }
