@@ -1,4 +1,5 @@
-import { Stub, AllowedSource, RenderContext, Pipeline } from '../render'
+import { AllowedSource, RenderContext, Pipeline } from '../render'
+import { Stub } from '../stub'
 import _ from 'lodash'
 import { Liquid } from 'liquidjs'
 import path from 'path'

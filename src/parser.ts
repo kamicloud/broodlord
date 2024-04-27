@@ -1,10 +1,10 @@
 import ts, { SyntaxKind } from "typescript";
 import { getAnnotation, getBasicTypeByKind, getComment, getName } from './helpers/ast'
 import path from 'path'
-import { Stub } from './render'
+import { Stub } from './stub'
 import _ from 'lodash'
 
-const getTemplate = (template_path: string, name: string) => {
+export const getTemplate = (template_path: string, name: string) => {
   const filename = path.resolve(`${template_path}/${name}.ts`);
   const program = ts.createProgram([filename], {
     allowJs: false,
@@ -34,228 +34,234 @@ export const parseAll = (template_path: string, templates: string[], specials: s
   return all
 }
 
-export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
-  const stubTemplate = new Stub.Template(name)
+const handleEnumAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFile: ts.SourceFile) => {
+  const stubEnum = new Stub.Enum(getName(ast, sourceFile))
 
-  const handleEnumAST = (ast: ts.Node) => {
-    const stubEnum = new Stub.Enum(getName(ast, sourceFile))
+  stubEnum.comment = getComment(ast)
+  stubEnum.annotation = getAnnotation(ast, sourceFile)
 
-    stubEnum.comment = getComment(ast)
-    stubEnum.annotation = getAnnotation(ast, sourceFile)
+  ast.forEachChild(enumAST => {
+    const stubEnumItem = new Stub.EnumItem(getName(enumAST, sourceFile))
 
-    ast.forEachChild(enumAST => {
-      const stubEnumItem = new Stub.EnumItem(getName(enumAST, sourceFile))
+    stubEnumItem.comment = getComment(enumAST)
+    stubEnumItem.annotation = getAnnotation(enumAST, sourceFile)
 
-      stubEnumItem.comment = getComment(enumAST)
-      stubEnumItem.annotation = getAnnotation(enumAST, sourceFile)
+    // default to name
+    stubEnumItem.type = Stub.EnumItemType.string
+    stubEnumItem.value = getName(enumAST, sourceFile)
 
-      // default to name
-      stubEnumItem.type = Stub.EnumItemType.string
-      stubEnumItem.value = getName(enumAST, sourceFile)
+    if (enumAST.kind === SyntaxKind.EnumMember) {
+      // enum item name
+      // when enum item has comment, value will appear at 3rd child
+      const value = enumAST.getChildAt(2, sourceFile)?.kind === SyntaxKind.EqualsToken ?
+        enumAST.getChildAt(3, sourceFile) :
+        enumAST.getChildAt(2, sourceFile)
 
-      if (enumAST.kind === SyntaxKind.EnumMember) {
-        // enum item name
-        // when enum item has comment, value will appear at 3rd child
-        const value = enumAST.getChildAt(2, sourceFile)?.kind === SyntaxKind.EqualsToken ?
-          enumAST.getChildAt(3, sourceFile) :
-          enumAST.getChildAt(2, sourceFile)
-
-        if (!value) {
-          return
-        }
-
-        stubEnumItem.type = value.kind === SyntaxKind.StringLiteral ? Stub.EnumItemType.string : Stub.EnumItemType.int
-        stubEnumItem.value = (value as any).text
-
-        stubEnum.items.push(stubEnumItem)
-
-        return
-      }
-    })
-
-    stubTemplate.enums.push(stubEnum)
-  }
-
-  const handleModelAST = (ast: ts.Node) => {
-    const stubModel = new Stub.Model(getName(ast, sourceFile))
-
-    stubModel.comment = getComment(ast)
-    stubModel.annotation = getAnnotation(ast, sourceFile)
-
-    ast.forEachChild(modelAST => {
-      if (modelAST.kind === SyntaxKind.Decorator) {
-        return;
-      }
-
-      const stubParameter = new Stub.Parameter(getName(modelAST, sourceFile))
-
-      stubParameter.comment = getComment(modelAST)
-      stubParameter.annotation = getAnnotation(modelAST, sourceFile)
-
-      // extends
-      if (modelAST.kind === SyntaxKind.HeritageClause) {
-        // console.log(modelAST)
-        stubModel.extends = modelAST.getChildAt(1, sourceFile).getText(sourceFile)
-
+      if (!value) {
         return
       }
 
-      modelAST.forEachChild(parameterAST => {
-        const decideType = (parameterAST: ts.Node) => {
-          const guessType = getBasicTypeByKind(parameterAST.kind)
+      stubEnumItem.type = value.kind === SyntaxKind.StringLiteral ? Stub.EnumItemType.string : Stub.EnumItemType.int
+      stubEnumItem.value = (value as any).text
 
-          if (guessType !== null) {
-            stubParameter.type = guessType
+      stubEnum.items.push(stubEnumItem)
 
-            return
-          }
+      return
+    }
+  })
 
-          // other types
-          if (parameterAST.kind === SyntaxKind.TypeReference) {
-            parameterAST.forEachChild(parameterTypeAST => {
-              if (parameterTypeAST.kind === SyntaxKind.Identifier) {
-                stubParameter.type = parameterTypeAST.getText(sourceFile)
+  stubTemplate.enums.push(stubEnum)
+}
 
-                return
-              }
+const parseModelAST = (ast: ts.Node, sourceFile: ts.SourceFile) => {
+  const stubModel = new Stub.Model(getName(ast, sourceFile))
 
-              if (parameterTypeAST.kind === SyntaxKind.QualifiedName) {
-                const relatedType = parameterTypeAST.getChildAt(0, sourceFile).getText(sourceFile)
-                stubParameter.type = parameterTypeAST.getChildAt(2, sourceFile).getText(sourceFile)
+  stubModel.comment = getComment(ast)
+  stubModel.annotation = getAnnotation(ast, sourceFile)
 
-                if (relatedType === 'Enums') {
-                  stubParameter.is_enum = true
-                } else if (relatedType === 'Models') {
-                  stubParameter.is_model = true
-                }
+  ast.forEachChild(modelAST => {
+    if (modelAST.kind === SyntaxKind.Decorator) {
+      return;
+    }
 
-                return;
-              }
-            })
+    const stubParameter = new Stub.Parameter(getName(modelAST, sourceFile))
 
-            return
-          }
+    stubParameter.comment = getComment(modelAST)
+    stubParameter.annotation = getAnnotation(modelAST, sourceFile)
 
-          if (parameterAST.kind === SyntaxKind.TypeLiteral) {
-            parameterAST.getChildren(sourceFile).forEach(parameterTypeAST => {
-              if (parameterTypeAST.kind === SyntaxKind.SyntaxList) {
-                parameterTypeAST.getChildren(sourceFile).forEach(mapAST => {
-                  // map
-                  if (mapAST.kind === SyntaxKind.IndexSignature) {
-                    stubParameter.is_map = true
-                      const keyAST = mapAST.getChildAt(1, sourceFile)
-                      const valueAST = mapAST.getChildAt(4, sourceFile)
+    // extends
+    if (modelAST.kind === SyntaxKind.HeritageClause) {
+      // console.log(modelAST)
+      stubModel.extends = modelAST.getChildAt(1, sourceFile).getText(sourceFile)
 
-                      const guessType = getBasicTypeByKind(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).kind)
-
-                      if (guessType) {
-                        stubParameter.key_type = guessType
-                      }
-
-                      decideType(valueAST)
-                  }
-                })
-              }
-            })
-          }
-        }
-
-        const handleIfArray = (typeAST: ts.Node) => {
-          stubParameter.is_array = true
-
-          decideType(typeAST)
-        }
-
-        // type | null
-        if (parameterAST.kind === SyntaxKind.UnionType) {
-          const childAST = parameterAST.getChildAt(0, sourceFile)
-          const typeAST = childAST.getChildAt(0, sourceFile)
-
-          const nullableAST = childAST.getChildAt(2, sourceFile)
-
-          // console.log(childAST, childAST.getText(sourceFile))
-          if (nullableAST.getText(sourceFile) === 'null') {
-            stubParameter.nullable = true
-          }
-
-          if (typeAST.kind === SyntaxKind.ArrayType) {
-            handleIfArray(typeAST.getChildAt(0, sourceFile))
-
-            return;
-          }
-
-          decideType(typeAST)
-
-          return
-        }
-
-        // array
-        if (parameterAST.kind === SyntaxKind.ArrayType) {
-          handleIfArray(parameterAST.getChildAt(0, sourceFile))
-
-          return
-        }
-
-        decideType(parameterAST);
-      })
-
-      if (!stubParameter.name) {
-        return;
-      }
-
-      stubModel.parameters.push(stubParameter)
-    })
-
-    return stubModel
-  }
-
-  const handleControllerAST = (ast: ts.Node) => {
-    const stubController = new Stub.Controller(getName(ast, sourceFile))
-
-    stubController.comment = getComment(ast)
-    stubController.annotation = getAnnotation(ast, sourceFile)
-
-    if (!stubController.name) {
       return
     }
 
-    stubTemplate.controllers.push(stubController)
+    modelAST.forEachChild(parameterAST => {
+      const decideType = (parameterAST: ts.Node) => {
+        const guessType = getBasicTypeByKind(parameterAST.kind)
 
-    ast.forEachChild(controllerAST => {
-      controllerAST.forEachChild(actionsAST => {
-        const stubAction = new Stub.Action(getName(controllerAST, sourceFile))
+        if (guessType !== null) {
+          stubParameter.type = guessType
 
-        stubAction.comment = getComment(controllerAST)
-        stubAction.annotation = getAnnotation(controllerAST, sourceFile)
+          return
+        }
 
-        const stubModel = handleModelAST(actionsAST)
+        // other types
+        if (parameterAST.kind === SyntaxKind.TypeReference) {
+          parameterAST.forEachChild(parameterTypeAST => {
+            if (parameterTypeAST.kind === SyntaxKind.Identifier) {
+              stubParameter.type = parameterTypeAST.getText(sourceFile)
 
-        stubAction.annotation = stubModel.annotation
-        stubAction.responses = stubModel.parameters
-        stubAction.comment = stubModel.comment
+              return
+            }
 
-        actionsAST.forEachChild(actionAST => {
-          if (actionAST.kind === SyntaxKind.Identifier) {
-            stubAction.name = actionAST.getText(sourceFile)
+            if (parameterTypeAST.kind === SyntaxKind.QualifiedName) {
+              const relatedType = parameterTypeAST.getChildAt(0, sourceFile).getText(sourceFile)
+              stubParameter.type = parameterTypeAST.getChildAt(2, sourceFile).getText(sourceFile)
 
-            return
+              if (relatedType === 'Enums') {
+                stubParameter.is_enum = true
+              } else if (relatedType === 'Models') {
+                stubParameter.is_model = true
+              }
+
+              return;
+            }
+          })
+
+          return
+        }
+
+        if (parameterAST.kind === SyntaxKind.TypeLiteral) {
+          parameterAST.getChildren(sourceFile).forEach(parameterTypeAST => {
+            if (parameterTypeAST.kind === SyntaxKind.SyntaxList) {
+              parameterTypeAST.getChildren(sourceFile).forEach(mapAST => {
+                // map
+                if (mapAST.kind === SyntaxKind.IndexSignature) {
+                  stubParameter.is_map = true
+                  const keyAST = mapAST.getChildAt(1, sourceFile)
+                  const valueAST = mapAST.getChildAt(4, sourceFile)
+
+                  const guessType = getBasicTypeByKind(keyAST.getChildAt(0, sourceFile).getChildAt(2, sourceFile).kind)
+
+                  if (guessType) {
+                    stubParameter.key_type = guessType
+                  }
+
+                  decideType(valueAST)
+                }
+              })
+            }
+          })
+        }
+      }
+
+      const handleIfArray = (typeAST: ts.Node) => {
+        stubParameter.is_array = true
+
+        decideType(typeAST)
+      }
+
+      // type | null
+      if (parameterAST.kind === SyntaxKind.UnionType) {
+        const childAST = parameterAST.getChildAt(0, sourceFile)
+        const typeAST = childAST.getChildAt(0, sourceFile)
+
+        const nullableAST = childAST.getChildAt(2, sourceFile)
+
+        // console.log(childAST, childAST.getText(sourceFile))
+        if (nullableAST.getText(sourceFile) === 'null') {
+          stubParameter.nullable = true
+        }
+
+        if (typeAST.kind === SyntaxKind.ArrayType) {
+          handleIfArray(typeAST.getChildAt(0, sourceFile))
+
+          return;
+        }
+
+        decideType(typeAST)
+
+        return
+      }
+
+      // array
+      if (parameterAST.kind === SyntaxKind.ArrayType) {
+        handleIfArray(parameterAST.getChildAt(0, sourceFile))
+
+        return
+      }
+
+      decideType(parameterAST);
+    })
+
+    if (!stubParameter.name) {
+      return;
+    }
+
+    stubModel.parameters.push(stubParameter)
+  })
+
+  return stubModel
+}
+
+const handleControllerAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFile: ts.SourceFile) => {
+  const stubController = new Stub.Controller(getName(ast, sourceFile))
+
+  stubController.comment = getComment(ast)
+  stubController.annotation = getAnnotation(ast, sourceFile)
+
+  if (!stubController.name) {
+    return
+  }
+
+  stubTemplate.controllers.push(stubController)
+
+  ast.forEachChild(controllerAST => {
+    controllerAST.forEachChild(actionsAST => {
+      const stubAction = new Stub.Action(getName(controllerAST, sourceFile))
+
+      stubAction.comment = getComment(controllerAST)
+      stubAction.annotation = getAnnotation(controllerAST, sourceFile)
+
+      const stubModel = parseModelAST(actionsAST, sourceFile)
+
+      stubAction.annotation = stubModel.annotation
+      stubAction.responses = stubModel.parameters
+      stubAction.comment = stubModel.comment
+
+      actionsAST.forEachChild(actionAST => {
+        if (actionAST.kind === SyntaxKind.Identifier) {
+          stubAction.name = actionAST.getText(sourceFile)
+
+          return
+        }
+
+        // action extends
+        if (actionAST.kind === SyntaxKind.HeritageClause) {
+          const extend = actionAST.getChildAt(1, sourceFile).getChildAt(0, sourceFile).getChildAt(0, sourceFile)
+          let extendStr = extend.getText(sourceFile)
+
+          if (extendStr.startsWith('Controllers.')) {
+            extendStr = extendStr.slice(12)
           }
 
-          if (actionAST.kind === SyntaxKind.HeritageClause) {
-            const extend = actionAST.getChildAt(1, sourceFile)
+          stubAction.extends = extend.getChildCount(sourceFile) === 0 ? `${stubController.name}.${extendStr}` : extendStr
 
-            stubAction.extends = extend.getChildCount(sourceFile) === 1 ? `${stubController.name}.${extend.getText(sourceFile)}` : extend.getText(sourceFile)
-
-            return
-          }
-        })
-
-        if (stubAction.name) {
-          stubController.actions.push(stubAction)
+          return
         }
       })
+
+      if (stubAction.name) {
+        stubController.actions.push(stubAction)
+      }
     })
-  }
+  })
+}
+
+export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
+  const stubTemplate = new Stub.Template(name)
 
   sourceFile?.forEachChild(templateAST => {
     if (templateAST.kind !== SyntaxKind.ModuleDeclaration) {
@@ -274,18 +280,19 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
           switch (ast.kind) {
             case SyntaxKind.EnumDeclaration:
               // enums
-              handleEnumAST(ast)
+              handleEnumAST(stubTemplate, ast, sourceFile)
 
               break;
             case SyntaxKind.ClassDeclaration:
               // models
-              const stubModel = handleModelAST(ast)
+              const stubModel = parseModelAST(ast, sourceFile)
+
               stubTemplate.models.push(stubModel)
 
               break;
             case SyntaxKind.ModuleDeclaration:
               // controllers
-              handleControllerAST(ast)
+              handleControllerAST(stubTemplate, ast, sourceFile)
 
               break;
           }
@@ -325,7 +332,7 @@ export const manageTemplate = (stubTemplate: Stub.Template) => {
     return stubAction.responses
   }
 
-  // prepare data for modeal extends
+  // prepare data for model extends
   stubTemplate.models.forEach(stubModel => {
     modelsMap[stubModel.name] = stubModel
   })

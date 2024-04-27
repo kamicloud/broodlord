@@ -2,7 +2,9 @@ import { parseAll } from "./parser";
 import path from 'path'
 import { log } from './helpers/log'
 import { useLiquid } from './helpers/stub'
-import { Stub, Config, BaseRender } from './render'
+import { BaseRender, WorkflowConfig, GlobalConfig } from './render'
+import { Stub } from './stub'
+import { pushRenderPathsToList } from './helpers/workflow'
 
 log.info('Application Starting')
 
@@ -12,41 +14,58 @@ if (!process.env["NODE_CONFIG_DIR"]) {
   process.env["NODE_CONFIG_DIR"] = __dirname + '/../config/';
 }
 
-const config = require('config');
+const c = require('config') as GlobalConfig
+const realRootPath = path.resolve(c.config?.output_root_path || '')
+const liquidTemplatePath = path.resolve(c.config?.liquid_template_path || `${c.template_path}/../stubs`)
 
 // parse
-const all = parseAll(config.template_path, config.template?.versions || [], config.template?.specials || []);
+const all = parseAll(c.template_path, c.template?.versions || [], c.template?.specials || []);
 
-const enabled = config.enabled
+const enabled = c.enabled
 // validate
+// TODO
 
-// reder
-const render = async (name: string, stubAll: Stub.All) => {
-  const c = require('config')
-
-  const realRootPath = path.resolve(c.config?.output_root_path || '')
-  const liquidTemplatePath = path.resolve(c.config?.liquid_template_path || `${c.template_path}/../stubs`)
-
-  const config = c.get(name) as Config
-
+const buildRendersByWorkflowConfig = (config: WorkflowConfig): { [key: string]: BaseRender } => {
   const rootPath = path.resolve(realRootPath, config.path)
-  const pipelines = config.pipelines
   const filters = config.filters
-
-  const renders: { [key: string]: BaseRender } = {}
   const liquid = useLiquid(liquidTemplatePath, filters)
+  const renders: { [key: string]: BaseRender } = {}
 
-  const registerRender = (render: any) => {
-    const r = new render(rootPath, liquid)
+  const list: string[] = []
 
-    renders[r.name] = r
+  // regist basic renders
+  pushRenderPathsToList(list, `${__dirname}/renders`)
+
+  // regist custom render
+  if (c.renders) {
+    c.renders.forEach(renderPath => {
+      pushRenderPathsToList(list, renderPath)
+    })
   }
 
-  registerRender(require(__dirname + '/renders/render-ast').default)
-  registerRender(require(__dirname + '/renders/render-liquid').default)
-  registerRender(require(__dirname + '/renders/render-openapi').default)
-  registerRender(require(__dirname + '/renders/render-postman').default)
-  registerRender(require(__dirname + '/renders/render-remove').default)
+  list.forEach((path: string) => {
+    const render = require(path).default
+
+    const r: BaseRender = new render(rootPath, liquid)
+
+    renders[r.name] = r
+  })
+
+  return renders
+}
+
+const processWorkflow = async (name: string, stubAll: Stub.All) => {
+  const config = c?.workflows[name] || undefined
+
+  if (!config) {
+    log.info(`[${name}] render config is missing! Skipped.`)
+
+    return
+  }
+
+  const pipelines = config.pipelines
+
+  const renders = buildRendersByWorkflowConfig(config)
 
   // pipelines
   pipelines.forEach((pipeline) => {
@@ -61,12 +80,15 @@ const render = async (name: string, stubAll: Stub.All) => {
   })
 }
 
+// process workflow
 if (enabled && enabled.length) {
   enabled.forEach((name: string) => {
     log.info(`Processing group ${name}`)
 
-    render(name, all)
+    // render
+    processWorkflow(name, all)
   })
 }
 
 log.info('Application Finished')
+

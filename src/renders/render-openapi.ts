@@ -1,4 +1,5 @@
-import { Stub, AllowedSource, BaseRender, Pipeline, RenderContext } from "../render";
+import { AllowedSource, BaseRender, Pipeline, RenderContext } from "../render";
+import { Stub } from '../stub'
 import path from 'path'
 
 export default class extends BaseRender {

@@ -1,9 +1,10 @@
 {
   "name": "broodlord",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "TS codegen",
   "scripts": {
-    "dev": "tsc --noEmit && cross-env NODE_CONFIG_DIR=./example/config ts-node ./src/main.ts"
+    "dev": "tsc --noEmit && cross-env NODE_CONFIG_DIR=./example/config ts-node ./src/main.ts",
+    "test": "tsc --noEmit && ts-node ./tests/parser.test.ts"
   },
   "main": "src/definitions.ts",
   "dependencies": {

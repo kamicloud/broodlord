@@ -1,0 +1,1741 @@
+{
+  "comment": [],
+  "name": "basic-case",
+  "enums": [
+    {
+      "comment": [
+        "Basic Enum",
+        "No value was set in Enum"
+      ],
+      "name": "BasicEnum",
+      "annotation": {},
+      "items": []
+    },
+    {
+      "comment": [],
+      "name": "StringEnum",
+      "annotation": {},
+      "items": [
+        {
+          "comment": [],
+          "name": "HELLO",
+          "annotation": {},
+          "type": "string",
+          "value": "hello"
+        },
+        {
+          "comment": [],
+          "name": "WORLD",
+          "annotation": {},
+          "type": "string",
+          "value": "world"
+        }
+      ]
+    },
+    {
+      "comment": [
+        "Another Comment Type",
+        "Another Comment Type Line2"
+      ],
+      "name": "IntEnum",
+      "annotation": {},
+      "items": [
+        {
+          "comment": [],
+          "name": "HELLO",
+          "annotation": {},
+          "type": "int",
+          "value": "3"
+        },
+        {
+          "comment": [],
+          "name": "WORLD",
+          "annotation": {},
+          "type": "int",
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "FloatEnum",
+      "annotation": {},
+      "items": [
+        {
+          "comment": [],
+          "name": "HELLO",
+          "annotation": {},
+          "type": "int",
+          "value": "3.14"
+        },
+        {
+          "comment": [],
+          "name": "WORLD",
+          "annotation": {},
+          "type": "int",
+          "value": "15926"
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "MixedEnum",
+      "annotation": {},
+      "items": [
+        {
+          "comment": [],
+          "name": "HELLO",
+          "annotation": {},
+          "type": "string",
+          "value": "hello"
+        },
+        {
+          "comment": [],
+          "name": "FOO",
+          "annotation": {},
+          "type": "int",
+          "value": "2"
+        },
+        {
+          "comment": [],
+          "name": "WORLD",
+          "annotation": {},
+          "type": "string",
+          "value": "world"
+        },
+        {
+          "comment": [],
+          "name": "BAR",
+          "annotation": {},
+          "type": "int",
+          "value": "5"
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "comment": [],
+      "name": "ClassEnum",
+      "annotation": {},
+      "parameters": [
+        {
+          "comment": [],
+          "name": "HELLO",
+          "annotation": {},
+          "type": ""
+        },
+        {
+          "comment": [],
+          "name": "WORLD",
+          "annotation": {},
+          "type": ""
+        }
+      ],
+      "extends": null
+    },
+    {
+      "comment": [],
+      "name": "Hello",
+      "annotation": {
+        "stringClassAnnotation": "hi",
+        "numberClassAnnotation": "123"
+      },
+      "parameters": [
+        {
+          "comment": [],
+          "name": "string",
+          "annotation": {},
+          "type": "string"
+        },
+        {
+          "comment": [],
+          "name": "string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "number",
+          "annotation": {},
+          "type": "number"
+        },
+        {
+          "comment": [],
+          "name": "number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number",
+          "annotation": {},
+          "type": "number",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_or_null",
+          "annotation": {},
+          "type": "BasicEnum",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "custom",
+          "annotation": {},
+          "type": "customInt"
+        },
+        {
+          "comment": [],
+          "name": "custom_or_null",
+          "annotation": {},
+          "type": "customInt",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "enum",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_or_null",
+          "annotation": {},
+          "type": "StringEnum",
+          "nullable": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_array",
+          "annotation": {},
+          "type": "BasicEnum",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_array",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_array": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "custom_array",
+          "annotation": {},
+          "type": "customInt",
+          "is_array": true
+        }
+      ],
+      "extends": null
+    },
+    {
+      "comment": [],
+      "name": "World",
+      "annotation": {},
+      "parameters": [],
+      "extends": null
+    },
+    {
+      "comment": [],
+      "name": "ExtendExample",
+      "annotation": {},
+      "parameters": [
+        {
+          "comment": [],
+          "name": "string",
+          "annotation": {},
+          "type": "string"
+        },
+        {
+          "comment": [],
+          "name": "string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "number",
+          "annotation": {},
+          "type": "number"
+        },
+        {
+          "comment": [],
+          "name": "number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number",
+          "annotation": {},
+          "type": "number",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_or_null",
+          "annotation": {},
+          "type": "BasicEnum",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "custom",
+          "annotation": {},
+          "type": "customInt"
+        },
+        {
+          "comment": [],
+          "name": "custom_or_null",
+          "annotation": {},
+          "type": "customInt",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "enum",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_or_null",
+          "annotation": {},
+          "type": "StringEnum",
+          "nullable": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_array",
+          "annotation": {},
+          "type": "BasicEnum",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_array",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_array": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "custom_array",
+          "annotation": {},
+          "type": "customInt",
+          "is_array": true
+        }
+      ],
+      "extends": "Hello"
+    },
+    {
+      "comment": [],
+      "name": "ExtendAddNewAttributeExample",
+      "annotation": {},
+      "parameters": [
+        {
+          "comment": [],
+          "name": "string",
+          "annotation": {},
+          "type": "string"
+        },
+        {
+          "comment": [],
+          "name": "string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "number",
+          "annotation": {},
+          "type": "number"
+        },
+        {
+          "comment": [],
+          "name": "number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string",
+          "annotation": {},
+          "type": "string",
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number",
+          "annotation": {},
+          "type": "number",
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_or_null",
+          "annotation": {},
+          "type": "string",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_or_null",
+          "annotation": {},
+          "type": "number",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "number",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_or_null",
+          "annotation": {},
+          "type": "BasicEnum",
+          "nullable": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "custom",
+          "annotation": {},
+          "type": "customInt"
+        },
+        {
+          "comment": [],
+          "name": "custom_or_null",
+          "annotation": {},
+          "type": "customInt",
+          "nullable": true
+        },
+        {
+          "comment": [],
+          "name": "enum",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_or_null",
+          "annotation": {},
+          "type": "StringEnum",
+          "nullable": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix",
+          "annotation": {},
+          "type": "World",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_or_null",
+          "annotation": {},
+          "type": "World",
+          "nullable": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_number_to_string_array",
+          "annotation": {},
+          "type": "string",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "number"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_number_array",
+          "annotation": {},
+          "type": "number",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string"
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "map_string_to_enum_array",
+          "annotation": {},
+          "type": "BasicEnum",
+          "is_array": true,
+          "is_map": true,
+          "key_type": "string",
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "enum_array",
+          "annotation": {},
+          "type": "StringEnum",
+          "is_array": true,
+          "is_enum": true
+        },
+        {
+          "comment": [],
+          "name": "model_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "model_without_prefix_array",
+          "annotation": {},
+          "type": "World",
+          "is_array": true,
+          "is_model": true
+        },
+        {
+          "comment": [],
+          "name": "custom_array",
+          "annotation": {},
+          "type": "customInt",
+          "is_array": true
+        },
+        {
+          "comment": [],
+          "name": "new_attribute",
+          "annotation": {},
+          "type": "string"
+        }
+      ],
+      "extends": "Hello"
+    },
+    {
+      "comment": [],
+      "name": "Generics",
+      "annotation": {},
+      "parameters": [
+        {
+          "comment": [],
+          "name": "T",
+          "annotation": {},
+          "type": ""
+        },
+        {
+          "comment": [],
+          "name": "typeT",
+          "annotation": {},
+          "type": "T"
+        }
+      ],
+      "extends": null
+    }
+  ],
+  "controllers": [
+    {
+      "comment": [],
+      "name": "Hello",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Hello",
+          "annotation": {
+            "methods": [
+              "GET",
+              "POST"
+            ]
+          },
+          "extends": null,
+          "requests": [
+            {
+              "comment": [],
+              "name": "number_request",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "number_response",
+              "annotation": {},
+              "type": "number"
+            }
+          ],
+          "path": "",
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "method": {
+            "GET": true,
+            "POST": true
+          }
+        },
+        {
+          "comment": [],
+          "name": "World",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "World",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Hello",
+          "annotation": {},
+          "extends": null,
+          "requests": [
+            {
+              "comment": [],
+              "name": "number_request",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "number_response",
+              "annotation": {},
+              "type": "number"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        },
+        {
+          "comment": [],
+          "name": "World",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "MagicProperty",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Hello",
+          "annotation": {},
+          "extends": null,
+          "requests": [
+            {
+              "comment": [],
+              "name": "string",
+              "annotation": {},
+              "type": "string"
+            },
+            {
+              "comment": [],
+              "name": "string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "number",
+              "annotation": {},
+              "type": "number"
+            },
+            {
+              "comment": [],
+              "name": "number_or_null",
+              "annotation": {},
+              "type": "number",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string",
+              "annotation": {},
+              "type": "string",
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string",
+              "annotation": {},
+              "type": "string",
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number",
+              "annotation": {},
+              "type": "number",
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number_or_null",
+              "annotation": {},
+              "type": "number",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_model_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "number",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_enum_or_null",
+              "annotation": {},
+              "type": "BasicEnum",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "custom",
+              "annotation": {},
+              "type": "customInt"
+            },
+            {
+              "comment": [],
+              "name": "custom_or_null",
+              "annotation": {},
+              "type": "customInt",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "enum",
+              "annotation": {},
+              "type": "StringEnum",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "enum_or_null",
+              "annotation": {},
+              "type": "StringEnum",
+              "nullable": true,
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "model",
+              "annotation": {},
+              "type": "World",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix",
+              "annotation": {},
+              "type": "World",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true
+            },
+            {
+              "comment": [],
+              "name": "number_array",
+              "annotation": {},
+              "type": "number",
+              "is_array": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number_array",
+              "annotation": {},
+              "type": "number",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_model_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_enum_array",
+              "annotation": {},
+              "type": "BasicEnum",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "enum_array",
+              "annotation": {},
+              "type": "StringEnum",
+              "is_array": true,
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "model_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "custom_array",
+              "annotation": {},
+              "type": "customInt",
+              "is_array": true
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "string",
+              "annotation": {},
+              "type": "string"
+            },
+            {
+              "comment": [],
+              "name": "string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "number",
+              "annotation": {},
+              "type": "number"
+            },
+            {
+              "comment": [],
+              "name": "number_or_null",
+              "annotation": {},
+              "type": "number",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string",
+              "annotation": {},
+              "type": "string",
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string",
+              "annotation": {},
+              "type": "string",
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number",
+              "annotation": {},
+              "type": "number",
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string_or_null",
+              "annotation": {},
+              "type": "string",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number_or_null",
+              "annotation": {},
+              "type": "number",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_model_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "number",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_enum_or_null",
+              "annotation": {},
+              "type": "BasicEnum",
+              "nullable": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "custom",
+              "annotation": {},
+              "type": "customInt"
+            },
+            {
+              "comment": [],
+              "name": "custom_or_null",
+              "annotation": {},
+              "type": "customInt",
+              "nullable": true
+            },
+            {
+              "comment": [],
+              "name": "enum",
+              "annotation": {},
+              "type": "StringEnum",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "enum_or_null",
+              "annotation": {},
+              "type": "StringEnum",
+              "nullable": true,
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "model",
+              "annotation": {},
+              "type": "World",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix",
+              "annotation": {},
+              "type": "World",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix_or_null",
+              "annotation": {},
+              "type": "World",
+              "nullable": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true
+            },
+            {
+              "comment": [],
+              "name": "number_array",
+              "annotation": {},
+              "type": "number",
+              "is_array": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_number_to_string_array",
+              "annotation": {},
+              "type": "string",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "number"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_number_array",
+              "annotation": {},
+              "type": "number",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string"
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_model_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "map_string_to_enum_array",
+              "annotation": {},
+              "type": "BasicEnum",
+              "is_array": true,
+              "is_map": true,
+              "key_type": "string",
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "enum_array",
+              "annotation": {},
+              "type": "StringEnum",
+              "is_array": true,
+              "is_enum": true
+            },
+            {
+              "comment": [],
+              "name": "model_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "model_without_prefix_array",
+              "annotation": {},
+              "type": "World",
+              "is_array": true,
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "custom_array",
+              "annotation": {},
+              "type": "customInt",
+              "is_array": true
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        },
+        {
+          "comment": [],
+          "name": "World",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "Extends",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Hello",
+          "annotation": {},
+          "extends": null,
+          "requests": [
+            {
+              "comment": [],
+              "name": "hello",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "world",
+              "annotation": {},
+              "type": "string"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        },
+        {
+          "comment": [],
+          "name": "ExtendInNamespace",
+          "annotation": {},
+          "extends": "Extends.Hello",
+          "requests": [
+            {
+              "comment": [],
+              "name": "hello",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "world",
+              "annotation": {},
+              "type": "string"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        },
+        {
+          "comment": [],
+          "name": "ExtendAcrossNamespace",
+          "annotation": {},
+          "extends": "World.Hello",
+          "requests": [
+            {
+              "comment": [],
+              "name": "number_request",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "number_response",
+              "annotation": {},
+              "type": "number"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        },
+        {
+          "comment": [],
+          "name": "ExtendAcrossNamespaceWithPrefix",
+          "annotation": {},
+          "extends": "Hello.Hello",
+          "requests": [
+            {
+              "comment": [],
+              "name": "number_request",
+              "annotation": {
+                "request": true
+              },
+              "type": "number"
+            }
+          ],
+          "responses": [
+            {
+              "comment": [],
+              "name": "number_response",
+              "annotation": {},
+              "type": "number"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "Generics",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Test",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [
+            {
+              "comment": [],
+              "name": "hello",
+              "annotation": {},
+              "type": "Generics",
+              "is_model": true
+            },
+            {
+              "comment": [],
+              "name": "world",
+              "annotation": {},
+              "type": "Generics",
+              "is_model": true
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    },
+    {
+      "comment": [],
+      "name": "ClassEnum",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Test",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [
+            {
+              "comment": [],
+              "name": "classEnum",
+              "annotation": {},
+              "type": "ClassEnum",
+              "is_enum": true
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    }
+  ]
+}

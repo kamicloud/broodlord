@@ -1,6 +1,6 @@
 import fs from "fs";
 import ts, {SyntaxKind} from "typescript";
-import {Stub} from '../render'
+import {Stub} from '../stub'
 
 export const writeASTFile = (astTargetPath: string, sourceFile: ts.SourceFile) => {
   const cache: any[] = [];
