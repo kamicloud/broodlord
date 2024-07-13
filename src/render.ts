@@ -43,7 +43,10 @@ export interface RenderContext<T extends Pipeline> {
   template: Stub.Template,
   controller?: Stub.Controller,
   action?: Stub.Action,
+  request?: Stub.Parameter,
+  response?: Stub.Parameter,
   model?: Stub.Model,
+  parameter?: Stub.Parameter,
   enum?: Stub.Enum,
   pipeline: T,
 }
@@ -92,6 +95,9 @@ export enum AllowedSource {
   constant = 'constant',
   enum = 'enum',
   model = 'model',
+  parameter = 'parameter',
   controller = 'controller',
   action = 'action',
+  request = 'request',
+  response = 'response',
 }

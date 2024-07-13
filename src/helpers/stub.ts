@@ -52,6 +52,24 @@ const getContextByTemplate = (
     return res
   }
 
+  if (source === AllowedSource.parameter) {
+    template.models.forEach(model => {
+      model.parameters.forEach(parameter => {
+        if (enableAnnotation && !parameter.annotation[enableAnnotation]) {
+          return
+        }
+
+        res.push({
+          ...basic,
+          model,
+          parameter,
+        })
+      })
+    })
+
+    return res
+  }
+
   if (source === AllowedSource.controller) {
     template.controllers.forEach(controller => {
       res.push({
@@ -74,6 +92,48 @@ const getContextByTemplate = (
           ...basic,
           controller,
           action,
+        })
+      })
+    })
+
+    return res
+  }
+
+  if (source === AllowedSource.request) {
+    template.controllers.forEach(controller => {
+      controller.actions.forEach(action => {
+        action.requests.forEach(request => {
+          if (enableAnnotation && !request.annotation[enableAnnotation]) {
+            return
+          }
+
+          res.push({
+            ...basic,
+            controller,
+            action,
+            request,
+          })
+        })
+      })
+    })
+
+    return res
+  }
+
+  if (source === AllowedSource.response) {
+    template.controllers.forEach(controller => {
+      controller.actions.forEach(action => {
+        action.responses.forEach(response => {
+          if (enableAnnotation && !response.annotation[enableAnnotation]) {
+            return
+          }
+
+          res.push({
+            ...basic,
+            controller,
+            action,
+            response,
+          })
         })
       })
     })
