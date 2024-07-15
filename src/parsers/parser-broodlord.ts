@@ -1,7 +1,7 @@
 import ts, { SyntaxKind } from "typescript";
-import { getAnnotation, getBasicTypeByKind, getComment, getName } from './helpers/ast'
+import { getAnnotation, getBasicTypeByKind, getComment, getName } from '../helpers/ast'
 import path from 'path'
-import { Stub } from './stub'
+import { Stub } from '../stub'
 import _ from 'lodash'
 
 export const getTemplate = (template_path: string, name: string) => {

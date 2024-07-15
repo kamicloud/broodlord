@@ -32,6 +32,11 @@ export const getBasicTypeByKind = (kind: SyntaxKind) => {
     return 'number'
   }
 
+  // number
+  if (kind === SyntaxKind.BigIntKeyword) {
+    return 'bigint'
+  }
+
   // string
   if (kind === SyntaxKind.StringKeyword) {
     return 'string'

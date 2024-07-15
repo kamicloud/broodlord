@@ -1,5 +1,4 @@
-import { parseAll } from "./parser";
-import path from 'path'
+import { parseAll } from "./parsers/parser-broodlord";
 import { log } from './helpers/log'
 import { GlobalConfig } from './render'
 import { processWorkflow } from './workflow'

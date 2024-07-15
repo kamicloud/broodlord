@@ -1,4 +1,4 @@
-import {getTemplate} from '../src/parser'
+import {getTemplate} from '../src/parsers/parser-broodlord'
 import fs from 'fs'
 
 const generatedStandardMode = true;

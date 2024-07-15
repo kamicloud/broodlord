@@ -14,6 +14,8 @@ export const request = PropertyDecorator
  */
 export const virtualAPI = ClassDeclarator
 
+export type int = number
+
 /**
  * Reserved for Http Methods
  */
