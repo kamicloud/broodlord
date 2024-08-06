@@ -116,6 +116,87 @@ declare namespace Models {
   }
 }
 
+declare namespace V2Controllers {
+  namespace Hello {
+    @methods([Method.GET, Method.POST])
+    class Hello {
+      @request
+      number_request: number
+
+      number_response: number
+    }
+
+    class World {
+
+    }
+  }
+
+  namespace World {
+    class Hello {
+      @request
+      number_request: number
+
+      number_response: number
+    }
+
+    class World {
+
+    }
+  }
+
+  namespace MagicProperty {
+    /**
+     * @see magic property
+     */
+    class Hello {
+      __request: Models.Hello
+      __response: Models.Hello
+    }
+
+    class World {
+
+    }
+  }
+
+  namespace Extends {
+    class Hello {
+      @request
+      hello: number
+
+      world: string
+    }
+
+    class ExtendInNamespace extends Hello {
+
+    }
+
+    // TODO
+    class ExtendAcrossNamespace extends World.Hello {
+
+    }
+
+    // TODO
+    class ExtendAcrossNamespaceWithPrefix extends Controllers.Hello.Hello {
+
+    }
+  }
+
+  // TODO: not supported yet
+  namespace Generics {
+    class Test {
+      hello: Models.Generics<number>
+      world: Models.Generics<Models.Hello>
+    }
+  }
+
+  namespace ClassEnum {
+    class Test {
+      classEnum: Enums.ClassEnum
+    }
+  }
+}
+
+
 declare namespace Controllers {
   namespace Hello {
     @methods([Method.GET, Method.POST])

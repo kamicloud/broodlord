@@ -9,7 +9,8 @@ const getContextByTemplate = (
   source: string | null,
   path: string,
   pipeline: Pipeline,
-  template: Stub.Template
+  template: Stub.Template,
+  scope?: string | null
 ): RenderContext<Pipeline>[] => {
   const { enable } = pipeline
   const enableAnnotation = enable
@@ -71,72 +72,143 @@ const getContextByTemplate = (
   }
 
   if (source === AllowedSource.controller) {
-    template.controllers.forEach(controller => {
-      res.push({
-        ...basic,
-        controller,
+    if (scope) {
+      if (template.scopes[scope]) {
+        template.scopes[scope].forEach(controller => {
+          res.push({
+            ...basic,
+            controller,
+          })
+        })
+      }
+    } else {
+      template.controllers.forEach(controller => {
+        res.push({
+          ...basic,
+          controller,
+        })
       })
-    })
+    }
 
     return res
   }
 
   if (source === AllowedSource.action) {
-    template.controllers.forEach(controller => {
-      controller.actions.forEach(action => {
-        if (enableAnnotation && !action.annotation[enableAnnotation]) {
-          return
-        }
+    if (scope) {
+      if (template.scopes[scope]) {
+        template.scopes[scope].forEach(controller => {
+          controller.actions.forEach(action => {
+            if (enableAnnotation && !action.annotation[enableAnnotation]) {
+              return
+            }
 
-        res.push({
-          ...basic,
-          controller,
-          action,
+            res.push({
+              ...basic,
+              controller,
+              action,
+            })
+          })
+        })
+      }
+    } else {
+      template.controllers.forEach(controller => {
+        controller.actions.forEach(action => {
+          if (enableAnnotation && !action.annotation[enableAnnotation]) {
+            return
+          }
+
+          res.push({
+            ...basic,
+            controller,
+            action,
+          })
         })
       })
-    })
+    }
 
     return res
   }
 
   if (source === AllowedSource.request) {
-    template.controllers.forEach(controller => {
-      controller.actions.forEach(action => {
-        action.requests.forEach(request => {
-          if (enableAnnotation && !request.annotation[enableAnnotation]) {
-            return
-          }
+    if (scope) {
+      if (template.scopes[scope]) {
+        template.scopes[scope].forEach(controller => {
+          controller.actions.forEach(action => {
+            action.requests.forEach(request => {
+              if (enableAnnotation && !request.annotation[enableAnnotation]) {
+                return
+              }
 
-          res.push({
-            ...basic,
-            controller,
-            action,
-            request,
+              res.push({
+                ...basic,
+                controller,
+                action,
+                request,
+              })
+            })
+          })
+        })
+      }
+    } else {
+      template.controllers.forEach(controller => {
+        controller.actions.forEach(action => {
+          action.requests.forEach(request => {
+            if (enableAnnotation && !request.annotation[enableAnnotation]) {
+              return
+            }
+
+            res.push({
+              ...basic,
+              controller,
+              action,
+              request,
+            })
           })
         })
       })
-    })
+    }
 
     return res
   }
 
   if (source === AllowedSource.response) {
-    template.controllers.forEach(controller => {
-      controller.actions.forEach(action => {
-        action.responses.forEach(response => {
-          if (enableAnnotation && !response.annotation[enableAnnotation]) {
-            return
-          }
+    if (scope) {
+      if (template.scopes[scope]) {
+        template.scopes[scope].forEach(controller => {
+          controller.actions.forEach(action => {
+            action.responses.forEach(response => {
+              if (enableAnnotation && !response.annotation[enableAnnotation]) {
+                return
+              }
 
-          res.push({
-            ...basic,
-            controller,
-            action,
-            response,
+              res.push({
+                ...basic,
+                controller,
+                action,
+                response,
+              })
+            })
+          })
+        })
+      }
+    } else {
+      template.controllers.forEach(controller => {
+        controller.actions.forEach(action => {
+          action.responses.forEach(response => {
+            if (enableAnnotation && !response.annotation[enableAnnotation]) {
+              return
+            }
+
+            res.push({
+              ...basic,
+              controller,
+              action,
+              response,
+            })
           })
         })
       })
-    })
+    }
 
     return res
   }
@@ -150,7 +222,7 @@ export const getContextsBySource = (
   path: string,
   pipeline: Pipeline,
 ): RenderContext<Pipeline>[] => {
-  const { special } = pipeline
+  const { special, scope } = pipeline
   const specialTemplate = special ? stubAll.specials[special] : null
 
   if (special && specialTemplate) {
@@ -160,6 +232,7 @@ export const getContextsBySource = (
       path,
       pipeline,
       specialTemplate,
+      scope
     )
   }
 
@@ -172,6 +245,7 @@ export const getContextsBySource = (
       path,
       pipeline,
       template,
+      scope
     ))
   })
 

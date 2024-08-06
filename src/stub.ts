@@ -25,6 +25,7 @@ export namespace Stub {
     public enums: Stub.Enum[] = []
     public models: Stub.Model[] = []
     public controllers: Stub.Controller[] = []
+    public scopes: {[key: string]: Stub.Controller[]} = {}
   }
 
   class NamedWithAnnotation extends Named {
@@ -47,6 +48,7 @@ export namespace Stub {
   }
 
   export class Controller extends NamedWithAnnotation {
+    scope: string = 'default'
     actions: Stub.Action[] = []
   }
 

@@ -86,6 +86,7 @@ export interface Pipeline {
   type: string
   source: AllowedSource | null
   special: string | null
+  scope?: string | null
   enable: string | null
 }
 

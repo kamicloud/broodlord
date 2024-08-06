@@ -206,7 +206,7 @@ const parseModelAST = (ast: ts.Node, sourceFile: ts.SourceFile) => {
   return stubModel
 }
 
-const handleControllerAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFile: ts.SourceFile) => {
+const handleControllerAST = (ast: ts.Node, sourceFile: ts.SourceFile) => {
   const stubController = new Stub.Controller(getName(ast, sourceFile))
 
   stubController.comment = getComment(ast)
@@ -215,8 +215,6 @@ const handleControllerAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFi
   if (!stubController.name) {
     return
   }
-
-  stubTemplate.controllers.push(stubController)
 
   ast.forEachChild(controllerAST => {
     controllerAST.forEachChild(actionsAST => {
@@ -258,6 +256,8 @@ const handleControllerAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFi
       }
     })
   })
+
+  return stubController
 }
 
 export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
@@ -268,6 +268,8 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
       return
     }
 
+    let current = ''
+
     // NodeObject - imports, declares
     templateAST.forEachChild(moduleAST => {
       // ignore declare
@@ -275,8 +277,13 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
         return
       }
 
+      if (moduleAST.kind === SyntaxKind.Identifier) {
+        current = moduleAST.getText(sourceFile)
+      }
+
       if (moduleAST.kind === SyntaxKind.ModuleBlock) {
         moduleAST.forEachChild((ast) => {
+
           switch (ast.kind) {
             case SyntaxKind.EnumDeclaration:
               // enums
@@ -292,7 +299,25 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
               break;
             case SyntaxKind.ModuleDeclaration:
               // controllers
-              handleControllerAST(stubTemplate, ast, sourceFile)
+              const stubController = handleControllerAST(ast, sourceFile)
+
+              if (stubController) {
+                if (current === 'Controllers') {
+                  stubTemplate.controllers.push(stubController)
+
+                  stubController.scope = 'default'
+                } else {
+                  const scopeName = current.replace('Controllers', '')
+
+                  if (!stubTemplate.scopes[scopeName]) {
+                    stubTemplate.scopes[scopeName] = []
+                  }
+
+                  stubTemplate.scopes[scopeName].push(stubController)
+
+                  stubController.scope = scopeName
+                }
+              }
 
               break;
           }
@@ -350,82 +375,94 @@ export const manageTemplate = (stubTemplate: Stub.Template) => {
     })
   })
 
-  // prepare data for extends
-  stubTemplate.controllers.forEach(stubTemplateController => {
-    stubTemplateController.actions.forEach(stubTemplateControllerAction => {
-      actionsMap[`${stubTemplateController.name}.${stubTemplateControllerAction.name}`] = stubTemplateControllerAction
+  const handleControllers = (controllers: Stub.Controller[]) => {
+    // prepare data for extends
+    controllers.forEach(stubTemplateController => {
+      stubTemplateController.actions.forEach(stubTemplateControllerAction => {
+        actionsMap[`${stubTemplateController.name}.${stubTemplateControllerAction.name}`] = stubTemplateControllerAction
+      })
     })
-  })
 
-  // action extends
-  stubTemplate.controllers.forEach(stubTemplateController => {
-    stubTemplateController.actions.forEach(stubTemplateControllerAction => {
-      if (stubTemplateControllerAction.extends) {
-        stubTemplateControllerAction.responses = getResponsesRecurse(stubTemplateControllerAction)
-      }
+    // action extends
+    controllers.forEach(stubTemplateController => {
+      stubTemplateController.actions.forEach(stubTemplateControllerAction => {
+        if (stubTemplateControllerAction.extends) {
+          stubTemplateControllerAction.responses = getResponsesRecurse(stubTemplateControllerAction)
+        }
+      })
     })
-  })
 
-  stubTemplate.controllers.forEach(stubTemplateController => {
-    stubTemplateController.actions.forEach(stubTemplateControllerAction => {
-      if (stubTemplateControllerAction.annotation.methods) {
-        stubTemplateControllerAction.annotation.methods.forEach((method: string) => {
-          if (method === 'OPTION') {
-            stubTemplateControllerAction.method.OPTION = true
-          }
-          if (method === 'GET') {
-            stubTemplateControllerAction.method.GET = true
-          }
-          if (method === 'POST') {
-            stubTemplateControllerAction.method.POST = true
-          }
-          if (method === 'PUT') {
-            stubTemplateControllerAction.method.PUT = true
-          }
-          if (method === 'PATCH') {
-            stubTemplateControllerAction.method.PATCH = true
-          }
-          if (method === 'DELETE') {
-            stubTemplateControllerAction.method.DELETE = true
+    controllers.forEach(stubTemplateController => {
+      stubTemplateController.actions.forEach(stubTemplateControllerAction => {
+        if (stubTemplateControllerAction.annotation.methods) {
+          stubTemplateControllerAction.annotation.methods.forEach((method: string) => {
+            if (method === 'OPTION') {
+              stubTemplateControllerAction.method.OPTION = true
+            }
+            if (method === 'GET') {
+              stubTemplateControllerAction.method.GET = true
+            }
+            if (method === 'POST') {
+              stubTemplateControllerAction.method.POST = true
+            }
+            if (method === 'PUT') {
+              stubTemplateControllerAction.method.PUT = true
+            }
+            if (method === 'PATCH') {
+              stubTemplateControllerAction.method.PATCH = true
+            }
+            if (method === 'DELETE') {
+              stubTemplateControllerAction.method.DELETE = true
+            }
+
+            stubTemplateControllerAction.methods.push(method)
+          })
+        }
+        const requests: Stub.Parameter[] = [];
+        const responses: Stub.Parameter[] = [];
+
+        // __request & __response
+        const excludeMagicParameters = stubTemplateControllerAction.responses.filter((stubParameter) => {
+          if (stubParameter.name === '__request' && stubParameter.is_model && modelsMap[stubParameter.type]) {
+            modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
+              requests.push(stubModelParameter)
+            })
+
+            return false;
           }
 
-          stubTemplateControllerAction.methods.push(method)
+          if (stubParameter.name === '__response' && stubParameter.is_model && modelsMap[stubParameter.type]) {
+            modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
+              responses.push(stubModelParameter)
+            })
+
+            return false
+          }
+
+          return true
         })
-      }
-      const requests: Stub.Parameter[] = [];
-      const responses: Stub.Parameter[] = [];
 
-      // __request & __response
-      const excludeMagicParameters = stubTemplateControllerAction.responses.filter((stubParameter) => {
-        if (stubParameter.name === '__request' && stubParameter.is_model && modelsMap[stubParameter.type]) {
-          modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
-            requests.push(stubModelParameter)
-          })
+        excludeMagicParameters.forEach(stubTemplateControllerActionResponse => {
+          if (stubTemplateControllerActionResponse.annotation.request) {
+            requests.push(stubTemplateControllerActionResponse)
+          } else {
+            responses.push(stubTemplateControllerActionResponse)
+          }
+        })
 
-          return false;
-        }
-
-        if (stubParameter.name === '__response' && stubParameter.is_model && modelsMap[stubParameter.type]) {
-          modelsMap[stubParameter.type].parameters.forEach(stubModelParameter => {
-            responses.push(stubModelParameter)
-          })
-
-          return false
-        }
-
-        return true
+        stubTemplateControllerAction.requests = requests
+        stubTemplateControllerAction.responses = responses
       })
-
-      excludeMagicParameters.forEach(stubTemplateControllerActionResponse => {
-        if (stubTemplateControllerActionResponse.annotation.request) {
-          requests.push(stubTemplateControllerActionResponse)
-        } else {
-          responses.push(stubTemplateControllerActionResponse)
-        }
-      })
-
-      stubTemplateControllerAction.requests = requests
-      stubTemplateControllerAction.responses = responses
     })
-  })
+  }
+
+  handleControllers(stubTemplate.controllers)
+
+  for (const scope in stubTemplate.scopes) {
+    if (Object.prototype.hasOwnProperty.call(stubTemplate.scopes, scope)) {
+      const element = stubTemplate.scopes[scope];
+
+      handleControllers(element)
+    }
+  }
 }

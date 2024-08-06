@@ -23,4 +23,5 @@ export default class extends BaseRender {
 interface LiquidConfig extends Pipeline {
   stub: string
   source: AllowedSource
+  scope?: string | null
 }
