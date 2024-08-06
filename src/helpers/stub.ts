@@ -24,6 +24,16 @@ const getContextByTemplate = (
   }
 
   if (source === AllowedSource.template) {
+    if (scope) {
+      return [{
+        ...basic,
+        template: {
+          ...template,
+          controllers: template.scopes[scope]
+        }
+      }]
+    }
+
     return [{
       ...basic,
     }]
