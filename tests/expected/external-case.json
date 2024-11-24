@@ -1,0 +1,34 @@
+{
+  "comment": [],
+  "name": "external-case",
+  "enums": [],
+  "models": [],
+  "controllers": [
+    {
+      "comment": [],
+      "name": "External",
+      "annotation": {},
+      "actions": [
+        {
+          "comment": [],
+          "name": "Case1",
+          "annotation": {},
+          "extends": null,
+          "requests": [],
+          "responses": [
+            {
+              "comment": [],
+              "name": "value",
+              "annotation": {},
+              "type": "World"
+            }
+          ],
+          "path": "",
+          "methods": [],
+          "method": {}
+        }
+      ]
+    }
+  ],
+  "scopes": {}
+}

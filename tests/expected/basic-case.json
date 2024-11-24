@@ -941,7 +941,6 @@
       "comment": [],
       "name": "Hello",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],
@@ -998,7 +997,6 @@
       "comment": [],
       "name": "World",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],
@@ -1044,7 +1042,6 @@
       "comment": [],
       "name": "MagicProperty",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],
@@ -1570,7 +1567,6 @@
       "comment": [],
       "name": "Extends",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],
@@ -1686,7 +1682,6 @@
       "comment": [],
       "name": "Generics",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],
@@ -1720,7 +1715,6 @@
       "comment": [],
       "name": "ClassEnum",
       "annotation": {},
-      "scope": "default",
       "actions": [
         {
           "comment": [],

@@ -306,8 +306,6 @@ export const parseTemplate = (name: string, sourceFile: ts.SourceFile) => {
               if (stubController) {
                 if (current === 'Controllers') {
                   stubTemplate.controllers.push(stubController)
-
-                  stubController.scope = 'default'
                 } else {
                   const scopeName = current.replace('Controllers', '')
 

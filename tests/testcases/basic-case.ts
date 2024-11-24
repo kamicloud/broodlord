@@ -59,7 +59,7 @@ namespace Enums {
   }
 }
 
-declare namespace Models {
+export declare namespace Models {
   @stringClassAnnotation('hi')
   @numberClassAnnotation(123)
   class Hello {
@@ -275,4 +275,8 @@ declare namespace Controllers {
       classEnum: Enums.ClassEnum
     }
   }
+}
+
+declare namespace Views {
+
 }
