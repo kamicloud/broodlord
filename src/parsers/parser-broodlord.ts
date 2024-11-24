@@ -34,6 +34,8 @@ export const parseAll = (template_path: string, templates: string[], specials: s
   return all
 }
 
+export default parseAll
+
 const handleEnumAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFile: ts.SourceFile) => {
   const stubEnum = new Stub.Enum(getName(ast, sourceFile))
 

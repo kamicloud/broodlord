@@ -48,7 +48,7 @@ export namespace Stub {
   }
 
   export class Controller extends NamedWithAnnotation {
-    scope: string = 'default'
+    scope?: string = undefined
     actions: Stub.Action[] = []
   }
 
