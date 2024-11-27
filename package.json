@@ -1,6 +1,6 @@
 {
   "name": "broodlord",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "TS codegen",
   "scripts": {
     "dev": "tsc --noEmit && cross-env NODE_CONFIG_DIR=./example/config ts-node ./src/main.ts",

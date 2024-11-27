@@ -58,8 +58,13 @@ export interface ParserConfig {
   template_path: string
   template: {
     versions: string[]
-    specials: string[]
+    specials: (string | TemplateConfig)[]
   }
+}
+
+export interface TemplateConfig {
+  name: string
+  path?: string[]
 }
 
 export interface RenderConfig {

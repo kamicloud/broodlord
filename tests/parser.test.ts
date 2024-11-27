@@ -23,7 +23,13 @@ testcasesFileNames.forEach(testcasesFileName => {
 
   const fileName = testcasesFileName.split('.')[0]
 
-  fs.writeFileSync(dir + `/${fileName}.json`, JSON.stringify(getTemplate(testcasesPath, fileName), null, 2) + '\n', {
+  fs.writeFileSync(dir + `/${fileName}.json`, JSON.stringify(getTemplate(testcasesPath, {
+    name: fileName,
+    path: fileName === 'external-case' ? [
+      fileName,
+      'basic-case',
+    ] : undefined,
+  }), null, 2) + '\n', {
     flag: 'w+'
   })
 })
