@@ -1,7 +1,7 @@
-import { parseAll } from "./parsers/parser-broodlord";
 import { log } from './helpers/log'
-import { GlobalConfig } from './render'
-import { processWorkflow } from './workflow'
+import {GlobalConfig, RenderConfig} from './render'
+import { processWorkflow, parseAll } from './workflow'
+import {ParserConfig} from "./parser";
 
 export const main = () => {
   log.info('Application Starting')
@@ -15,7 +15,7 @@ export const main = () => {
   const c = require('config') as GlobalConfig
 
   // parse
-  const all = parseAll(c.template_path, c.template?.versions || [], c.template?.specials || []);
+  const all = parseAll(c as ParserConfig);
 
   const enabled = c.enabled
   // validate
@@ -27,7 +27,7 @@ export const main = () => {
       log.info(`Processing group ${name}`)
 
       // render
-      processWorkflow(name, all, c)
+      processWorkflow(name, all, c as RenderConfig)
     })
   }
 

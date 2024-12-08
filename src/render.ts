@@ -3,6 +3,7 @@ import _ from "lodash";
 import fs from './helpers/fs'
 import { getContextsBySource, LiquidFilters } from './helpers/stub'
 import { Stub } from './stub'
+import { ParserConfig } from './parser'
 
 export abstract class BaseRender {
   public name = ''
@@ -54,20 +55,8 @@ export interface RenderContext<T extends Pipeline> {
 export interface GlobalConfig extends ParserConfig, RenderConfig {
 }
 
-export interface ParserConfig {
-  template_path: string
-  template: {
-    versions: string[]
-    specials: (string | TemplateConfig)[]
-  }
-}
-
-export interface TemplateConfig {
-  name: string
-  path?: string[]
-}
-
 export interface RenderConfig {
+  template_path: string
   config?: {
     output_root_path?: string
     liquid_template_path?: string

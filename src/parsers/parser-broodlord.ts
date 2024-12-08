@@ -3,7 +3,19 @@ import {getAnnotation, getBasicTypeByKind, getComment, getName} from '../helpers
 import path from 'path'
 import {Stub} from '../stub'
 import _ from 'lodash'
-import {TemplateConfig} from "../render";
+import {BaseParser, TemplateConfig} from "../parser";
+
+export default class extends BaseParser {
+  public name = 'broodlord'
+
+  parse(template: TemplateConfig): Stub.Template {
+    if (!template.path) {
+      return getTemplate(this.config.template_path, template)
+    }
+
+    return getTemplate(this.config.template_path, template)
+  }
+}
 
 export const getTemplate = (templateRootPath: string, templateConfig: TemplateConfig) => {
   const stubTemplates = (templateConfig.path || [templateConfig.name])
@@ -25,30 +37,6 @@ export const getTemplate = (templateRootPath: string, templateConfig: TemplateCo
 
   return stubTemplate
 }
-
-export const parseAll = (templatePath: string, templates: string[], specials: (string | TemplateConfig)[]) => {
-  const all = new Stub.All()
-
-  templates.forEach(template => {
-    all.templates.push(getTemplate(templatePath, {
-      name: template,
-    }))
-  })
-
-  specials.forEach(special => {
-    if (_.isString(special)) {
-      all.specials[special] = getTemplate(templatePath, {
-        name: special,
-      })
-    } else {
-      all.specials[special.name] = getTemplate(templatePath, special)
-    }
-  })
-
-  return all
-}
-
-export default parseAll
 
 const handleEnumAST = (stubTemplate: Stub.Template, ast: ts.Node, sourceFile: ts.SourceFile) => {
   const stubEnum = new Stub.Enum(getName(ast, sourceFile))
