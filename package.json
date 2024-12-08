@@ -4,7 +4,7 @@
   "description": "TS codegen",
   "scripts": {
     "dev": "tsc --noEmit && cross-env NODE_CONFIG_DIR=./example/config ts-node ./src/main.ts",
-    "test": "tsc --noEmit && ts-node ./tests/parser.test.ts"
+    "test": "mocha --require ts-node/register **/*.test.ts"
   },
   "main": "src/definitions.ts",
   "dependencies": {
@@ -21,6 +21,8 @@
   "devDependencies": {
     "@types/config": "^3.3.0",
     "@types/lodash": "^4.14.194",
-    "@types/node": "^18.15.11"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^18.15.11",
+    "mocha": "^11.0.1"
   }
 }
