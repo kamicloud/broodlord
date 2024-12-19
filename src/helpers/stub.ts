@@ -9,7 +9,7 @@ const getContextByTemplate = (
   source: string | null,
   path: string,
   pipeline: Pipeline,
-  template: Stub.Template,
+  template?: Stub.Template | null,
   scope?: string | null
 ): RenderContext<Pipeline>[] => {
   const { enable } = pipeline
@@ -21,6 +21,10 @@ const getContextByTemplate = (
     all: stubAll,
     template,
     pipeline,
+  }
+
+  if (!template) {
+    return [basic]
   }
 
   if (source === AllowedSource.template) {
@@ -235,7 +239,7 @@ export const getContextsBySource = (
   const { special, scope } = pipeline
   const specialTemplate = special ? stubAll.specials[special] : null
 
-  if (special && specialTemplate) {
+  if ((special && specialTemplate) || source === AllowedSource.all) {
     return getContextByTemplate(
       stubAll,
       source,

@@ -1,4 +1,4 @@
-import { BaseRender, Pipeline, RenderContext } from "../render";
+import { BaseRender, Pipeline, RenderContext } from '../render';
 import path from 'path'
 
 export default class extends BaseRender {

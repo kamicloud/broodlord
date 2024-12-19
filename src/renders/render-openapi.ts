@@ -1,6 +1,6 @@
-import { AllowedSource, BaseRender, Pipeline, RenderContext } from "../render";
+import { AllowedSource, BaseRender, Pipeline, RenderContext } from '../render';
 import { Stub } from '../stub'
-import path from 'path'
+import path from 'node:path'
 
 export default class extends BaseRender {
   public name = 'openapi'
@@ -44,13 +44,13 @@ export default class extends BaseRender {
     const handleModelAST = (prefix: string, stubTemplateModel: Stub.Model | Stub.Action, parameters: Stub.Parameter[]) => {
       const stubModel: any = {
         type: 'object',
-        description: stubTemplateModel.comment.join("\n"),
+        description: stubTemplateModel.comment.join('\n'),
         properties: {},
         xml: {},
         required: [] as string[],
       }
       // model comment
-      stubModel.description = stubTemplateModel.comment.join("\n")
+      stubModel.description = stubTemplateModel.comment.join('\n')
 
       // model name
       const modelName = `${prefix}.` + stubTemplateModel.name
@@ -59,7 +59,7 @@ export default class extends BaseRender {
         const stubParameter: any = {
         }
 
-        stubParameter.description = stubTemplateModelParameter.comment.join("\n")
+        stubParameter.description = stubTemplateModelParameter.comment.join('\n')
 
         let parameterName = stubTemplateModelParameter.name
 
@@ -144,10 +144,10 @@ export default class extends BaseRender {
             const stubAction: any = {
               tags: [],
               summary: stubTemplateControllerAction.comment[0] ? stubTemplateControllerAction.comment[0] : '',
-              description: stubTemplateControllerAction.comment.join("\n"),
+              description: stubTemplateControllerAction.comment.join('\n'),
               responses: {
                 '200': {
-                  description: stubTemplateControllerAction.comment.join("\n"),
+                  description: stubTemplateControllerAction.comment.join('\n'),
                   content: {
                     'application/json': {
                       schema: {
@@ -175,7 +175,7 @@ export default class extends BaseRender {
               requests.push({
                 name: stubTemplateControllerActionRequest.name,
                 in: 'query',
-                description: stubTemplateControllerActionRequest.comment.join("\n"),
+                description: stubTemplateControllerActionRequest.comment.join('\n'),
                 required: !stubTemplateControllerActionRequest.nullable,
                 schema: {
                   type: stubTemplateControllerActionRequest.type
@@ -217,7 +217,7 @@ export default class extends BaseRender {
 
     const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_openapi.json`)
 
-    this.fs.writeFile(finalPath, JSON.stringify(openapi, null, 2) + "\n")
+    this.fs.writeFile(finalPath, JSON.stringify(openapi, null, 2) + '\n')
   }
 }
 

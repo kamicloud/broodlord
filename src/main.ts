@@ -1,18 +1,20 @@
+#!/usr/bin/env ts-node
+
 import { log } from './helpers/log'
-import {GlobalConfig, RenderConfig} from './render'
+import {ParserConfig} from './parser';
+import {RenderConfig} from './render'
 import { processWorkflow, parseAll } from './workflow'
-import {ParserConfig} from "./parser";
 
 export const main = () => {
   log.info('Application Starting')
 
   require('dotenv').config()
 
-  if (!process.env["NODE_CONFIG_DIR"]) {
-    process.env["NODE_CONFIG_DIR"] = __dirname + '/../config/';
+  if (!process.env.NODE_CONFIG_DIR) {
+    process.env.NODE_CONFIG_DIR = __dirname + '/../config/';
   }
 
-  const c = require('config') as GlobalConfig
+  const c = require('config') as ParserConfig & RenderConfig
 
   // parse
   const all = parseAll(c as ParserConfig);

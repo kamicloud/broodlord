@@ -1,9 +1,9 @@
-import ts, {SyntaxKind} from "typescript";
+import ts, {SyntaxKind} from 'typescript';
 import {getAnnotation, getBasicTypeByKind, getComment, getName} from '../helpers/ast'
-import path from 'path'
+import path from 'node:path'
 import {Stub} from '../stub'
 import _ from 'lodash'
-import {BaseParser, TemplateConfig} from "../parser";
+import {BaseParser, TemplateConfig} from '../parser';
 
 export default class extends BaseParser {
   public name = 'broodlord'
