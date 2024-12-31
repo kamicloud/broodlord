@@ -1,6 +1,6 @@
-import { AllowedSource, BaseRender, Pipeline, RenderContext } from "../render";
+import { AllowedSource, BaseRender, Pipeline, RenderContext } from '../render';
 import { Stub } from '../stub'
-import path from 'path'
+import path from 'node:path'
 
 export default class extends BaseRender {
   public name = 'postman'
@@ -31,7 +31,7 @@ export default class extends BaseRender {
           name: stubAction.name,
           request: {
             method: 'POST',
-            description: stubAction.comment.join("\n"),
+            description: stubAction.comment.join('\n'),
             header: [],
             body: {
               mode: 'formdata',
@@ -54,7 +54,7 @@ export default class extends BaseRender {
             key: stubRequest.name,
             value: '',
             type: stubRequest.type,
-            description: stubRequest.comment.join("\n"),
+            description: stubRequest.comment.join('\n'),
             disabled: false,
           }
 
@@ -71,7 +71,7 @@ export default class extends BaseRender {
 
     const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, `${stubTemplate.name.toLowerCase()}_postman.json`)
 
-    this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2) + "\n")
+    this.fs.writeFile(finalPath, JSON.stringify(postmanStub, null, 2) + '\n')
   }
 }
 

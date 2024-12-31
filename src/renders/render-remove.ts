@@ -1,5 +1,5 @@
-import { BaseRender, Pipeline, RenderContext } from "../render";
-import path from 'path'
+import { BaseRender, Pipeline, RenderContext } from '../render';
+import path from 'node:path'
 
 export default class extends BaseRender {
   public name = 'remove'

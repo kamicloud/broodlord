@@ -2,14 +2,14 @@ import { AllowedSource, BaseRender, Pipeline, RenderContext } from '../render'
 import path from 'node:path'
 
 export default class extends BaseRender {
-  public name = 'ast'
-  public allowedSource: AllowedSource | null = AllowedSource.all
+  public name = 'broodlord'
+  public allowedSource: AllowedSource | null = AllowedSource.template
 
-  assertConfig(ctx: RenderContext<ASTConfig>): boolean {
+  assertConfig(ctx: RenderContext<BroodlordConfig>): boolean {
     return !!(ctx.pipeline && ctx.pipeline.path)
   }
 
-  render(ctx: RenderContext<ASTConfig>): void {
+  render(ctx: RenderContext<BroodlordConfig>): void {
     const finalPath = path.resolve(this.rootPath, ctx.pipeline.path, 'ast.json')
 
     const all = ctx.all
@@ -18,6 +18,6 @@ export default class extends BaseRender {
   }
 }
 
-interface ASTConfig extends Pipeline {
+interface BroodlordConfig extends Pipeline {
   path: string
 }

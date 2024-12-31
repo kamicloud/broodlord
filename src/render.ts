@@ -1,9 +1,7 @@
-import { Liquid } from "liquidjs";
-import _ from "lodash";
-import fs from './helpers/fs'
+import { Liquid } from 'liquidjs';
+import fs from './helpers/helper-fs'
 import { getContextsBySource, LiquidFilters } from './helpers/stub'
 import { Stub } from './stub'
-import { ParserConfig } from './parser'
 
 export abstract class BaseRender {
   public name = ''
@@ -41,18 +39,15 @@ export abstract class BaseRender {
 export interface RenderContext<T extends Pipeline> {
   path: string,
   all: Stub.All,
-  template: Stub.Template,
-  controller?: Stub.Controller,
-  action?: Stub.Action,
-  request?: Stub.Parameter,
-  response?: Stub.Parameter,
-  model?: Stub.Model,
-  parameter?: Stub.Parameter,
-  enum?: Stub.Enum,
+  template?: Stub.Template | null,
+  controller?: Stub.Controller | null,
+  action?: Stub.Action | null,
+  request?: Stub.Parameter | null,
+  response?: Stub.Parameter | null,
+  model?: Stub.Model | null,
+  parameter?: Stub.Parameter | null,
+  enum?: Stub.Enum | null,
   pipeline: T,
-}
-
-export interface GlobalConfig extends ParserConfig, RenderConfig {
 }
 
 export interface RenderConfig {

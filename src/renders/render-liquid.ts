@@ -1,5 +1,5 @@
-import path from "path";
-import { BaseRender, Pipeline, RenderContext, AllowedSource } from "../render";
+import path from 'node:path';
+import { BaseRender, Pipeline, RenderContext, AllowedSource } from '../render';
 
 export default class extends BaseRender {
   public name = 'render'
@@ -12,11 +12,11 @@ export default class extends BaseRender {
     const stub = ctx.pipeline.stub
     const content = this.liquid.renderFileSync(stub, ctx);
 
-    const contents = content.split("\n")
+    const contents = content.split('\n')
 
     const finalPath = path.resolve(this.rootPath, contents[0].trim())
 
-    this.fs.writeFile(finalPath, contents.slice(1).join("\n"))
+    this.fs.writeFile(finalPath, contents.slice(1).join('\n'))
   }
 }
 

@@ -1,11 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { Stub } from './stub'
+import {BaseParser, ParserConfig, TemplateConfig} from './parser';
 import {BaseRender, RenderConfig, WorkflowConfig} from './render'
 import { log } from './helpers/log'
 import { useLiquid } from './helpers/stub'
-import {BaseParser, ParserConfig, TemplateConfig} from "./parser";
-import _ from "lodash";
+import _ from 'lodash';
 
 export const parseAll = (c: ParserConfig) => {
   const parsers = buildParsersByParserConfig(c)
@@ -60,23 +60,29 @@ const normalizeTemplateConfig = (templateConfigs: (string | TemplateConfig)[] | 
   })
 }
 
-export const pushTypescriptFilePathsToList = (list: string[], renderPath: string) => {
-  const customRenderFiles = fs.readdirSync(renderPath)
+export const pushTypescriptFilePathsToList = (list: string[], folder: string, prefix: 'parser' | 'render') => {
+  const customRenderFiles = fs.readdirSync(folder)
 
-  customRenderFiles.forEach((customRenderFile: string) => {
-    if (!customRenderFile.startsWith('render-') || !customRenderFile.endsWith('.ts')) {
+  customRenderFiles.forEach((filename: string) => {
+    if (!filename.startsWith(`${prefix}-`) || !filename.endsWith('.ts')) {
+      log.info(`[${filename}] is not a parser file. Skipped.`)
+
       return
     }
 
-    const customRenderPath = path.resolve(renderPath, customRenderFile)
+    const customerClassPath = path.resolve(folder, filename)
 
-    const customRender = require(customRenderPath)
+    const customClass = require(customerClassPath)
 
-    if (!customRender || !customRender.default) {
+    if (!customClass || !customClass.default) {
+      log.info(`[${filename}] is not a valid parser file. Skipped.`)
+
       return
     }
 
-    list.push(customRenderPath)
+    log.debug(`Found ${prefix}: ${customerClassPath}`)
+
+    list.push(customerClassPath)
   })
 }
 
@@ -98,6 +104,7 @@ export const processWorkflow = async (name: string, stubAll: Stub.All, c: Render
     const render = renders[pipeline.type]
 
     if (!render) {
+      log.info(`[${name}] render ${pipeline.type} is missing! Skipped.`)
 
       return
     }
@@ -111,12 +118,12 @@ export const buildParsersByParserConfig = (c: ParserConfig): {[key: string]: Bas
 
   const list: string[] = []
 
-  pushTypescriptFilePathsToList(list, `${__dirname}/parsers`)
+  pushTypescriptFilePathsToList(list, `${__dirname}/parsers`, 'parser')
 
   // regist custom parser
   if (c.parsers) {
     c.parsers.forEach(parserPath => {
-      pushTypescriptFilePathsToList(list, parserPath)
+      pushTypescriptFilePathsToList(list, parserPath, 'parser')
     })
   }
 
@@ -143,12 +150,12 @@ export const buildRendersByWorkflowConfig = (config: WorkflowConfig, c: RenderCo
   const list: string[] = []
 
   // regist basic renders
-  pushTypescriptFilePathsToList(list, `${__dirname}/renders`)
+  pushTypescriptFilePathsToList(list, `${__dirname}/renders`, 'render')
 
   // regist custom render
   if (c.renders) {
     c.renders.forEach(renderPath => {
-      pushTypescriptFilePathsToList(list, renderPath)
+      pushTypescriptFilePathsToList(list, renderPath, 'render')
     })
   }
 

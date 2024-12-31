@@ -1,4 +1,4 @@
-import {Stub} from "./stub";
+import {Stub} from './stub';
 
 export abstract class BaseParser {
   public name = ''

@@ -1,0 +1,13 @@
+{{ path }}/test.graphql
+{% for enum in template.enums %}
+  enum {{ enum.name }}{{ ' {' }}{% for value in enum.items %}
+  {{ value.name }}{% endfor %}
+  }
+{% endfor %}
+{% for model in template.models %}
+  type {{ model.name }} {
+  placeholder__: String{% for parameter in model.parameters %}
+  {{ parameter.name }}: {% if parameter.is_array %}[{% endif %}{{ parameter.type | graphql_type }}{% if parameter.is_array %}]{% endif %}{% if parameter.nullable %}!{% endif %}{% endfor %}
+  }
+
+{% endfor %}

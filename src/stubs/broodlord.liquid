@@ -1,0 +1,50 @@
+./templates/test.output
+
+import {request, ClassDeclarator, Method, methods, PropertyDecorator} from 'broodlord';
+
+type integer = number
+const path = (path: string) => ClassDeclarator
+const inPath = PropertyDecorator
+type timestamp = string
+
+{{ 'declare namespace Enums {' }}{% for enum in template.enums %}{% if enum.comment.length > 0 %}
+  /**{% for comment in enum.comment %}
+    * {{ comment }}{% endfor %}
+  */{% endif %}
+  {{ '  enum ' }}{{ enum.name }}{{ ' {' }}{% for item in enum.items %}{% if item.comment.length > 0 %}
+    /**{% for comment in item.comment %}
+      * {{ comment }}{% endfor %}
+    */{% endif %}
+    // {{ item.name }} = '{{ item.value }}',{% endfor %}
+  {{ '  }' }}
+{% endfor %}{{ '}' }}
+
+{{ 'declare namespace Models {' }}{% for model in template.models %}{% if model.comment.length > 0 %}
+  /**{% for comment in model.comment %}
+    * {{ comment }}{% endfor %}
+  */{% endif %}
+  class {{ model.name }}{{ ' {' }}{% for parameter in model.parameters %}{% if parameter.comment.length > 0 %}
+    /**{% for comment in parameter.comment %}
+      * {{ comment }}{% endfor %}
+    */{% endif %}
+    {{ parameter.name }}: {% if parameter.is_enum %}Enums.{% endif %}{{ parameter.type }}{% if parameter.is_array %}[]{% endif %}{% if parameter.nullable %} | null{% endif %}{% endfor %}
+  {{ '  }' }}
+{% endfor %}{{ '}' }}
+
+{{ 'declare namespace Controllers {' }}{% for controller in template.controllers %}
+  {{ '  namespace ' }}{{ controller.name }}{{ ' {' }}{% for action in controller.actions %}{% if action.comment.length > 0 %}
+    /**{% for comment in action.comment %}
+      * {{ comment }}{% endfor %}
+    */{% endif %}{% if action.annotation.path %}
+    @path('{{ action.annotation.path }}'){% endif %}
+    @methods([{% for method in action.methods %}Method.{{ method }}{% endfor %}])
+    {{ '    class ' }}{{ action.name }}{{ ' {' }}{% for parameter in action.requests %}
+      {{ '      @request' }}{% if parameter.annotation.inPath %}
+        @inPath{% endif %}
+      {{ '      ' }}{{ parameter.name }}: {% if parameter.is_enum %}Enums.{% endif %}{% if parameter.is_model %}Models.{% endif %}{{ parameter.type }}{% if parameter.is_array %}[]{% endif %}{% if parameter.nullable %} | null{% endif %}{% endfor %}{% if action.responses.length > 0 %}
+
+      {% for parameter in action.responses %}
+        {{ '      ' }}{% if parameter.name == 'data' %}__response{% else %}{{ parameter.name }}{% endif %}: {% if parameter.is_enum %}Enums.{% endif %}{% if parameter.is_model %}Models.{% endif %}{{ parameter.type }}{% if parameter.is_array %}[]{% endif %}{% if parameter.nullable %} | null{% endif %}{% endfor %}{% endif %}
+    {{ '    }' }}
+  {% endfor %}{{ '  }' }}
+{% endfor %}{{ '}' }}

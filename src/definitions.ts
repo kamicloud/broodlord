@@ -31,4 +31,5 @@ export enum Method {
 }
 
 export * from './stub'
+export * from './parser'
 export * from './render'
